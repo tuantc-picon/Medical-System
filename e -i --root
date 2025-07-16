@@ -1,0 +1,35 @@
+[33m22d2552[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeature/create-RBAC[m[33m)[m change file bearer.py
+[33m1c67a12[m[33m ([m[1;31morigin/feature/create-RBAC[m[33m)[m delete credentials_exception in file authention.py
+[33m3d72821[m fix bug in project
+[33m5e206d7[m change fix spelling error in file schema.schedule
+[33m4386807[m delete Enum and format code
+[33m777fd7b[m delete Enum and format code
+[33m5866bc5[m fix logout and merge schemas in register
+[33mba67621[m rename and fix logout
+[33mef3e83c[m change RBAC
+[33m7413f49[m set up permissions
+[33m162340a[m fix verify_schedule and rename function
+[33m29d7a48[m[33m ([m[1;31morigin/develop[m[33m, [m[1;32mdevelop[m[33m)[m fix verify_schedule and rename function
+[33m3a50d5a[m change file services/authention.py
+[33md9cd063[m rename func create_schedule -> create_schedule_doctor
+[33mf3a94b3[m Complete doctor work schedule
+[33m50f60ac[m add thread delete expired token
+[33m307ac2e[m git push -f origin feature/login-authentication
+[33m49e8318[m create authentication login
+[33m12ff876[m Update README.md
+[33m0ebda22[m change api/route.py
+[33m1b06188[m  use class Register in file services/register.py
+[33mcdf0c31[m Copy core/common and core/models from feature/models
+[33m253fa64[m create register admin, doctor, patient
+[33mfe46603[m add full models change add abstract BaseModels in core.common.Base change file models.certificate and models.user change file models.user
+[33m7b1f95c[m Init project structure and update README
+[33m13af823[m feat: Add/update certificate model
+[33mb89a77c[m change file models.user
+[33m1343a95[m change file models.certificate and models.user
+[33m955177a[m  add abstract BaseModels in core.common.Base
+[33mc87c195[m change
+[33m70ce999[m add full models
+[33m9c4d679[m Update README.md
+[33m1dc8f6b[m Init App
+[33m3307a07[m Update README.md
+[33mf204ccc[m Initial commit
