@@ -59,6 +59,7 @@ babel_configs = BabelConfigs(
 
 API_PORT = int(os.getenv("API_PORT"))
 
+
 # LANGUAGE_MESSAGE = "ja"
 LANGUAGE_MESSAGE = "en"
 DEFAULT_TIMEZONE_SERVER = os.getenv("DEFAULT_TIMEZONE_SERVER", "UTC")
