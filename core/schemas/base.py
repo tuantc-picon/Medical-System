@@ -135,7 +135,6 @@ class MSBaseSchema(BaseModel):
         return cls.model_validate(items).model_dump()
 
 
-
     @property
     def data(self):
         return self.dict()

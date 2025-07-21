@@ -5,7 +5,6 @@ router = APIRouter(redirect_slashes=False)
 
 router.include_router(users_v1)
 
-
 @router.get("/health")
 def health_check():
     return {"status": "healthy"}
