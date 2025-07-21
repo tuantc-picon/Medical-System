@@ -42,6 +42,7 @@ A backend system for managing medical appointment bookings, built for university
 ### MedicalNote *(Optional)*
 - `appointment_id`, `note`, `created_by`, `created_at`
 
+### Others
 ---
 
 ## 🔁 Appointment Flow
