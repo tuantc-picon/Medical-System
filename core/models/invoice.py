@@ -27,7 +27,6 @@ class InvoiceMedical(BaseModel):
     appointment = relationship(Appointment, back_populates="invoice_medical")
 
 
-
 class InvoiceHospitalized(BaseModel):
     __tablename__ = 'invoice_hospitalized'
     # Forkey
