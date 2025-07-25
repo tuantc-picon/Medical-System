@@ -8,3 +8,4 @@ class Token(MSBaseSchema):
 class TokenData(MSBaseSchema):
     email: EmailStr
     name: str
+    role: str
