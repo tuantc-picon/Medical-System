@@ -22,6 +22,7 @@ class Appointment(BaseModel):
     invoice_medical = relationship("InvoiceMedical", back_populates="appointment")
 
 
+
 class ScheduleDoctor(BaseModel):
     __tablename__ = 'schedule_doctor'
     # Forkey
@@ -32,6 +33,7 @@ class ScheduleDoctor(BaseModel):
     note = Column(String)
     #relationship
     doctor = relationship("Doctor", back_populates="schedules")
+
 
 
 

@@ -8,7 +8,6 @@ class DrugAllergy(BaseModel):
     # Forkey
     medicine_id = Column(Integer, ForeignKey('medicine.id'))
     patient_id = Column(Integer, ForeignKey('patient.id'))
-
     # relationship
     patient = relationship("Patient", back_populates="drug_allergies")
     medicine = relationship("Medicine", back_populates="drug_allergies")
