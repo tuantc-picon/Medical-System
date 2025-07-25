@@ -1,17 +1,22 @@
-from aiohttp import payload_type
 from jose import jwt, JWTError
-from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
-from app.users import schemas
+
 from datetime import datetime, timedelta
+
 from config import (JWT_ACCESS_SECRET_KEY,
                     JWT_REFRESH_SECRET_KEY,
                     ALGORITHM,
                     ACCESS_TOKEN_EXPIRED,
                     REFRESH_TOKEN_EXPIRED)
-from pydantic import EmailStr
-from app.users.schemas import TokenData
 
-def create_token(data: dict, secret_key, algorithms, expires_delta: timedelta = None):
+from pydantic import EmailStr
+
+from app.users.schemas import TokenData
+from core.services.query import verify
+from sqlalchemy.ext.asyncio import AsyncSession
+
+
+
+def create_token(data: dict, secret_key, expires_delta: timedelta = None,  algorithms=ALGORITHM,):
     to_encode = data.copy()
     expire = datetime.utcnow() + expires_delta
     to_encode.update({"exp": expire})
@@ -23,24 +28,26 @@ def create_access_token(data: dict):
     to_encode = data.copy()
     to_encode.update({"type": "access"})
     expires = timedelta(minutes=ACCESS_TOKEN_EXPIRED)
-    return create_token(to_encode, JWT_ACCESS_SECRET_KEY, ALGORITHM, expires_delta=expires)
+    return create_token(to_encode, JWT_ACCESS_SECRET_KEY, expires_delta=expires)
 
 
 def create_refresh_token(data: dict):
     to_encode = data.copy()
     to_encode.update({"type": "refresh"})
     expires = timedelta(days=REFRESH_TOKEN_EXPIRED)
-    return create_token(to_encode, JWT_REFRESH_SECRET_KEY, ALGORITHM, expires_delta=expires)
+    return create_token(to_encode, JWT_REFRESH_SECRET_KEY, expires_delta=expires)
 
 
-def verify_token(token: str, credentials_exception):
+async def verify_token(token: str, credentials_exception, db: AsyncSession):
     try:
         payload = jwt.decode(token, JWT_ACCESS_SECRET_KEY, algorithms=[ALGORITHM])
         email : EmailStr = payload.get("subEmail")
         name: str = payload.get("subName")
-        if email or name is None:
+        role : str = payload.get("role")
+        db_verify = verify(db)
+        if not await db_verify.db(email, name, role):
             raise credentials_exception
-        token_data = TokenData(email=email, name=name)
+        token_data = TokenData(email=email, name=name, role = role)
     except JWTError:
         raise credentials_exception
     return token_data

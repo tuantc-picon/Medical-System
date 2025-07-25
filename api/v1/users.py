@@ -17,14 +17,16 @@ async def register_admin(
     admin: AdminCreate,
     db: AsyncSession = Depends(get_async_db_session)
 ):
-    return await Register.admin(admin, db)
+    db_register = Register(db)
+    return await db_register.admin(admin)
 
 @router.post("/register/doctor", status_code=status.HTTP_201_CREATED)
 async def register_doctor(
     doctor: DoctorCreate,
     db: AsyncSession = Depends(get_async_db_session)
 ):
-    return await Register.doctor(doctor, db)
+    db_register = Register(db)
+    return await db_register.doctor(doctor)
 
 
 @router.post("/register/patient", status_code=status.HTTP_201_CREATED)
@@ -32,4 +34,5 @@ async def register_patient(
     patient: PatientCreate,
     db: AsyncSession = Depends(get_async_db_session)
 ):
-    return await Register.patient(patient, db)
+    db_register = Register(db)
+    return await db_register.patient(patient)
