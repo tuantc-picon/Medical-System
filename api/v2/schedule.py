@@ -5,7 +5,6 @@ from core.services.schedule import create_schedule
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.users.schemas.schedule import ScheduleDoctorCreate
 from core.common.database import get_async_db_session
-from core.services.role_base import require_role
 
 
 schedule_router = APIRouter(
