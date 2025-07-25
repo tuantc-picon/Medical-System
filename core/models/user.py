@@ -28,7 +28,7 @@ class Admin(User):
     address = Column(String, nullable=False)
 
     __mapper_args__ = {
-        'polymorphic_identity': RoleEnum.ADMIN.value
+        'polymorphic_identity': RoleEnum.ADMIN
     }
 
 class Doctor(User):
@@ -37,7 +37,7 @@ class Doctor(User):
     specialization = Column(String, nullable=False)
     graduated_at = Column(String, nullable=False)
     __mapper_args__ = {
-        'polymorphic_identity': RoleEnum.DOCTOR.value
+        'polymorphic_identity': RoleEnum.DOCTOR
     }
     # relationship Doctor
     appointments = relationship("Appointment", back_populates="doctor")
@@ -52,7 +52,7 @@ class Patient(User):
     job = Column(String)
     insurance_number = Column(String)
     __mapper_args__ = {
-        'polymorphic_identity': RoleEnum.PATIENT.value
+        'polymorphic_identity': RoleEnum.PATIENT
     }
     # relation Patient
     appointments = relationship("Appointment", back_populates="patient")

@@ -4,15 +4,14 @@ from core.common.database import get_async_db_session
 from fastapi.security.oauth2 import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi import Depends
 from core.services.authention import login as LOGIN
-from core.services.role_base import require_role
 
 Login = APIRouter(
+    prefix="/v2/login",
     tags=["authentication"]
 )
 
 
-@Login.post("/login")
-async def login(db:AsyncSession = Depends(get_async_db_session),
-
-                request: OAuth2PasswordRequestForm = Depends()):
-    return await LOGIN(db, request)
+@Login.post("/")
+async def login(    request: OAuth2PasswordRequestForm = Depends(),
+                    db:AsyncSession = Depends(get_async_db_session) ):
+    return await LOGIN(request, db)

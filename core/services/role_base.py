@@ -6,7 +6,7 @@ from app.users.schemas.token import TokenData
 
 def require_role(required_roles: list[RoleEnum]):
     async def role_checker(
-        current_user: TokenData = Depends(authenticate_token)
+            current_user: TokenData = Depends(authenticate_token)
     ):
         if current_user.role not in required_roles:
             raise HTTPException(
@@ -14,4 +14,5 @@ def require_role(required_roles: list[RoleEnum]):
                 detail="You do not have permission to perform this action"
             )
         return current_user
+
     return role_checker
