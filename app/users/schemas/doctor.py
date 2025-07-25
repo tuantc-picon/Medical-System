@@ -13,6 +13,6 @@ class DoctorRead(DoctorBase):
     created_at: MSTimestamp
     updated_at: MSTimestamp
 
-class DoctorUpdate():
-    specialization: Optional[str]
-    graduated_at: Optional[str]
+class DoctorUpdate(DoctorBase):
+    specialization: Optional[str] = None
+    graduated_at: Optional[str] = None

@@ -10,9 +10,9 @@ class PatientCreate(UserCreate):
     job: str
     insurance_number: str
 
-class PatientUpdate():
-    job: Optional[str]
-    insurance_number: Optional[str]
+class PatientUpdate(PatientBase):
+    job: Optional[str] = None
+    insurance_number: Optional[str] = None
 
 class PatientRead(PatientBase):
     created_at: MSTimestamp

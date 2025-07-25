@@ -6,10 +6,11 @@ from fastapi import Depends
 from core.services.authention import login
 
 Login = APIRouter(
+    prefix="/v2/login",
     tags=["authentication"]
 )
 
 
-@Login.post("/login")
+@Login.post("/")
 async def login(db:AsyncSession = Depends(get_async_db_session), request: OAuth2PasswordRequestForm = Depends()):
     return await login(db, request)

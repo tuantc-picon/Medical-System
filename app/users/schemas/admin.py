@@ -13,6 +13,6 @@ class AdminRead(AdminBase):
     created_at: MSTimestamp
     updated_at: MSTimestamp
 
-class AdminUpdate():
-    phone_number: Optional[str]
-    address: Optional[str]
+class AdminUpdate(AdminBase):
+    phone_number: Optional[str] = None
+    address: Optional[str] = None
