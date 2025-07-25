@@ -1,15 +1,12 @@
-from typing import Any, List, Optional, Union
-
-from pydantic import BaseModel, ConfigDict
-
-
 from datetime import datetime, date
 from typing import Annotated, Optional
+from typing import List
 from typing import Union, Any, Dict
 from zoneinfo import ZoneInfo
 
 from fastapi import Query
 from pydantic import BaseModel
+from pydantic import ConfigDict
 from pydantic import GetJsonSchemaHandler
 from pydantic_core import CoreSchema
 from pydantic_core.core_schema import ValidationInfo
@@ -45,7 +42,7 @@ class MSTimestamp:
 
     @classmethod
     def validate(
-        cls, value: Union[int, datetime], info: ValidationInfo
+            cls, value: Union[int, datetime], info: ValidationInfo
     ) -> datetime | int | None:
         if value is None:
             return value
@@ -58,7 +55,7 @@ class MSTimestamp:
 
     @classmethod
     def __get_pydantic_json_schema__(
-        cls, core_schema: CoreSchema, handler: GetJsonSchemaHandler
+            cls, core_schema: CoreSchema, handler: GetJsonSchemaHandler
     ) -> Dict[str, Any]:
         return {
             "type": "integer",
@@ -107,23 +104,32 @@ class MSTimestamp:
         return f"Timestamp({self.to_epoch(self)})"
 
 
+# class MSBaseSchema(BaseModel):
+#     model_config = ConfigDict(from_attributes=True)
+#
+#     def __init__(
+#         self, items: Union[Any, List[Any]], many: Optional[bool] = False, **kwargs
+#     ):
+#         if many:
+#             schema_data = [self.__class__.from_orm(item).dict() for item in items]
+#             object.__setattr__(self, "__dict__", {"items": schema_data})
+#         else:
+#             if hasattr(items, "__dict__"):
+#                 schema_data = self.from_orm(items).dict()
+#                 object.__setattr__(self, "__dict__", schema_data)
+#             else:
+#                 object.__setattr__(self, "__dict__", items)
+#                 super().__init__(**kwargs)
+
+
 class MSBaseSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    def __init__(
-        self, items: Union[Any, List[Any]], many: Optional[bool] = False, **kwargs
-    ):
+    @classmethod
+    def from_orm_safe(cls, items: Union[Any, List[Any]], many: bool = False):
         if many:
-            schema_data = [self.__class__.from_orm(item).dict() for item in items]
-            object.__setattr__(self, "__dict__", {"items": schema_data})
-        else:
-            if hasattr(items, "__dict__"):
-                schema_data = self.from_orm(items).dict()
-                object.__setattr__(self, "__dict__", schema_data)
-            else:
-                object.__setattr__(self, "__dict__", items)
-                super().__init__(**kwargs)
-
+            return [cls.model_validate(item).model_dump() for item in items]
+        return cls.model_validate(items).model_dump()
 
     @property
     def data(self):

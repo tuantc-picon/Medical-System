@@ -45,7 +45,16 @@ ASYNC_DATABASE_CONN_URL = URL.create(
     password=DATABASE_PASSWORD,
 )
 
-DATABASE_CONN_URL = f"postgresql://{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_NAME}"
+DATABASE_CONN_URL = str(
+    URL.create(
+        drivername="postgresql",  # dùng 'postgresql' cho Alembic
+        username=DATABASE_USER,
+        password=DATABASE_PASSWORD,
+        host=DATABASE_HOST,
+        port=int(DATABASE_PORT),
+        database=DATABASE_NAME,
+    )
+)
 
 
 DEFAULT_PAGE_SIZE = int(os.getenv("DEFAULT_PAGE_SIZE"))
@@ -58,7 +67,6 @@ babel_configs = BabelConfigs(
 )
 
 API_PORT = int(os.getenv("API_PORT"))
-
 
 # LANGUAGE_MESSAGE = "ja"
 LANGUAGE_MESSAGE = "en"

@@ -12,14 +12,14 @@ class MSBaseException(Exception):
 
 class SystemException(MSBaseException):
     def __init__(
-        self, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, message=None, **kwargs
+            self, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, message=None, **kwargs
     ):
         super().__init__(status_code, message or _("System error!"), **kwargs)
 
 
 class ServiceException(MSBaseException):
     def __init__(
-        self, status_code=status.HTTP_503_SERVICE_UNAVAILABLE, message=None, **kwargs
+            self, status_code=status.HTTP_503_SERVICE_UNAVAILABLE, message=None, **kwargs
     ):
         super().__init__(status_code, message or _("Service error!"), **kwargs)
 
@@ -33,9 +33,10 @@ class BadRequestException(MSBaseException):
     def __init__(self, status_code=status.HTTP_400_BAD_REQUEST, message=None, **kwargs):
         super().__init__(status_code, message or _("Bad request!"), **kwargs)
 
+
 class UnAuthenticateException(MSBaseException):
     def __init__(
-        self, status_code=status.HTTP_401_UNAUTHORIZED, message=None, **kwargs
+            self, status_code=status.HTTP_401_UNAUTHORIZED, message=None, **kwargs
     ):
         super().__init__(status_code, message or _("Un-Authentication!"), **kwargs)
 
