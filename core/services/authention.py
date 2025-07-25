@@ -18,5 +18,6 @@ async def login(db : AsyncSession, request: OAuth2PasswordRequestForm):
     refresh_token = create_refresh_token(data={"sub": query_user.username})
     return {"access_token": access_token,
             "refresh_token": refresh_token,
+            "role": query_user.role,
             "token_type": "Bearer"
             }

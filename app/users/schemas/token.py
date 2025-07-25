@@ -1,5 +1,6 @@
 from . import MSBaseSchema, MSTimestamp
 from pydantic import EmailStr
+from core.common.constants import RoleEnum
 
 class Token(MSBaseSchema):
     access_token: str
@@ -8,4 +9,4 @@ class Token(MSBaseSchema):
 class TokenData(MSBaseSchema):
     email: EmailStr
     name: str
-    role: str
+    role: RoleEnum

@@ -43,8 +43,8 @@ async def verify_token(token: str, credentials_exception, db: AsyncSession):
         payload = jwt.decode(token, JWT_ACCESS_SECRET_KEY, algorithms=[ALGORITHM])
         email : EmailStr = payload.get("subEmail")
         name: str = payload.get("subName")
-        role : str = payload.get("role")
-        if not await verify_db(email, name, role, db):
+        role = payload.get("role")
+        if not await verify_db(email, name,role, db):
             raise credentials_exception
         token_data = TokenData(email=email, name=name, role = role)
     except JWTError:
