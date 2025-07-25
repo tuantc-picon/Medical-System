@@ -1,0 +1,1 @@
+from .register import register_admin, register_doctor, register_patient
