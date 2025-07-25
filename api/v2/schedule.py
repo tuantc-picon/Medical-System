@@ -15,6 +15,5 @@ schedule_router = APIRouter(
 
 @schedule_router.post("/", status_code=status.HTTP_201_CREATED)
 async def createSchedule(schedule: ScheduleDoctorCreate,
-                         db:AsyncSession = Depends(get_async_db_session),
-                         role: RoleEnum = Depends( require_role([RoleEnum.ADMIN, RoleEnum.DOCTOR]))):
+                         db:AsyncSession = Depends(get_async_db_session)):
     return await create_schedule(schedule, db)
