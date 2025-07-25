@@ -12,4 +12,4 @@ async def authenticate_token(token_client : str = Depends(oauth2_scheme), db: As
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    return await token.vecrify_token(token_client,credentials_exception, db)
+    return await token.verify_token(token_client, credentials_exception, db)

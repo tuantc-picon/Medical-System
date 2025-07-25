@@ -24,14 +24,12 @@ async def verify_db(email: EmailStr, name: str, role: str, db: AsyncSession):
     return True
 
 
-async def verify_authention(username: str, password: str, role: RoleEnum, db: AsyncSession):
+async def verify_authention(username: str, password: str, db: AsyncSession):
     stmt = select(User).where(User.email == username)
     result = await db.execute(stmt)
     user = result.scalar_one_or_none()
     if not user:
         return None
     if not Hash.verify(password, user.password):
-        return None
-    if user.role != role:
         return None
     return user

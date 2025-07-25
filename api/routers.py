@@ -17,10 +17,11 @@ router = APIRouter(redirect_slashes=False)
 
 from api.v2.users import router as users_v2
 from api.v2.authentication import Login as login_v2
+from api.v2.schedule import schedule_router as schedule_v2
 
 router.include_router(users_v2)
 router.include_router(login_v2)
-
+router.include_router(schedule_v2)
 
 
 

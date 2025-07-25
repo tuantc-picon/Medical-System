@@ -7,7 +7,14 @@ def require_role(required_roles: list[RoleEnum]):
     async def role_checker(
         current_user: TokenData = Depends(authenticate_token)
     ):
-        if current_user.role not in required_roles:
+        try:
+            user_role = RoleEnum(current_user.role)  # ép kiểu
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Invalid role in token"
+            )
+        if user_role not in required_roles:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="You do not have permission to perform this action"
