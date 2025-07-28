@@ -19,7 +19,6 @@ class PrescriptionDetail(BaseModel):
     medicine_batch = relationship("MedicineBatch", back_populates="prescription_detail")
 
 
-
 class Prescription(BaseModel):
     __tablename__ = 'prescription'
 

@@ -45,7 +45,6 @@ class Doctor(User):
 
 
 
-
 class Patient(User):
     __tablename__ = 'patient'
     id = Column(Integer, ForeignKey('users.id'), primary_key=True)
