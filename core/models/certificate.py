@@ -1,21 +1,23 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, func
 from sqlalchemy.orm import relationship
-from core.common.Base import BaseModel
+from . import Base
 
 
-class DoctorCertificate(BaseModel):
+class DoctorCertificate(Base):
     __tablename__ = 'doctor_certificate'
     # Forkey
     doctor_id = Column(Integer, ForeignKey('doctor.id'))
     certificate_id = Column(Integer, ForeignKey('certificate.id'))
+    archived_dateTime = Column(DateTime(timezone=True), nullable=False)
     # realtionship
     doctor = relationship("Doctor", back_populates="doctor_certificates")
     certificate = relationship("Certificate", back_populates="doctor_certificates")
 
 
 
-class Certificate(BaseModel):
+class Certificate(Base):
     __tablename__ = 'certificate'
-    archived_id = Column(DateTime(timezone=True), nullable=False)
+    certificate_name = Column(String, nullable=False)
+    certificate_code = Column(String, nullable=False, unique=True)
     # relationship
     doctor_certificates = relationship("DoctorCertificate", back_populates="certificate")
