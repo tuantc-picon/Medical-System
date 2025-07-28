@@ -1,19 +1,18 @@
-from sqlalchemy import Column, Integer, DateTime, String, ForeignKey, Enum, func
-from . import Base, RoleEnum, GenderEnum # đã định nghĩa trong __init__.py
+from sqlalchemy import Column, Integer, String, ForeignKey, Enum, func
+from . import RoleEnum, GenderEnum # đã định nghĩa trong __init__.py
 from sqlalchemy.orm import relationship
 
+from core.common.Base import BaseModel
 
-class User(Base):
+
+class User(BaseModel):
     __tablename__ = 'users'
-    id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
     password = Column(String,nullable=False)
     gender = Column(Enum(GenderEnum), nullable=False)
     age = Column(Integer)
     role = Column(Enum(RoleEnum), nullable=False)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     __mapper_args__ = {
         'polymorphic_on': role, # cột định danh -> lấy cột nào để xác định.

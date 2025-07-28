@@ -1,14 +1,12 @@
 from sqlalchemy import Column, Integer, ForeignKey, String, DateTime
 from sqlalchemy.orm import relationship
-from sqlalchemy.sql import func
-
-from . import Base
+from core.common.Base import BaseModel
 
 
-class PrescriptionDetail(Base):
+
+class PrescriptionDetail(BaseModel):
     __tablename__ = 'prescriptions_detail'
 
-    id = Column(Integer, primary_key=True)
     # Foreign Keys
     prescription_id = Column(Integer, ForeignKey('prescription.id'))
     medicine_id = Column(Integer, ForeignKey('medicine.id'))
@@ -16,8 +14,6 @@ class PrescriptionDetail(Base):
 
     quantity = Column(Integer)
     expiry_medicine = Column(DateTime(timezone=True))
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     # Relationships
     prescription = relationship("Prescription", back_populates="prescription_detail")
@@ -25,15 +21,13 @@ class PrescriptionDetail(Base):
     medicine_batch = relationship("MedicineBatch", back_populates="prescription_detail")
 
 
-class Prescription(Base):
+class Prescription(BaseModel):
     __tablename__ = 'prescription'
 
     id = Column(Integer, primary_key=True)
     appointment_id = Column(Integer, ForeignKey('appointment.id'))
 
     Dosage = Column(String)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     # Relationships
     appointments = relationship("Appointment", back_populates="prescription")

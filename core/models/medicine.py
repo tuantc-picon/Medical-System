@@ -1,25 +1,21 @@
-from sqlalchemy import Column, Integer, String, DateTime, func, ForeignKey, Date
+from sqlalchemy import Column, Integer, String, ForeignKey, Date
 from sqlalchemy.orm import relationship
-from . import Base
+from core.common.Base import BaseModel
 
 
-class DrugAllergy(Base):
+class DrugAllergy(BaseModel):
     __tablename__ = 'drug_allergy'
-    id = Column(Integer, primary_key=True)
     # Forkey
     medicine_id = Column(Integer, ForeignKey('medicine.id'))
     patient_id = Column(Integer, ForeignKey('patient.id'))
 
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     # relationship
     patient = relationship("Patient", back_populates="drug_allergies")
     medicine = relationship("Medicine", back_populates="drug_allergies")
 
 
-class Medicine(Base):
+class Medicine(BaseModel):
     __tablename__ = 'medicine'
-    id = Column(Integer, primary_key=True)
     # Forkey
     medicine_batch_id = Column(Integer, ForeignKey('medicine_batch.id'))
 
@@ -27,8 +23,6 @@ class Medicine(Base):
     price_unit = Column(Integer, nullable=False)
     quantity = Column(Integer, nullable=False)
     unit = Column(String, nullable=False)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     # relationship
     drug_allergies = relationship(DrugAllergy, back_populates="medicine")
     medicine_batch = relationship("MedicineBatch", back_populates="medicine")
@@ -37,15 +31,12 @@ class Medicine(Base):
 
 
 
-class MedicineBatch(Base):
+class MedicineBatch(BaseModel):
     __tablename__ = 'medicine_batch'
-    id = Column(Integer, primary_key=True)
     unit_price = Column(Integer,nullable=False)
     current_quantity = Column(Integer,nullable=False)
     note = Column(String)
     expiry_date= Column(Date, nullable=False)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     # relationship
     medicine = relationship("Medicine", back_populates="medicine_batch")
     prescription_detail = relationship("PrescriptionDetail", back_populates="medicine_batch")
