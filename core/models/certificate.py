@@ -1,9 +1,9 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, func
 from sqlalchemy.orm import relationship
-from . import Base
+from ..common.Base import BaseModel
 
 
-class DoctorCertificate(Base):
+class DoctorCertificate(BaseModel):
     __tablename__ = 'doctor_certificate'
     # Forkey
     doctor_id = Column(Integer, ForeignKey('doctor.id'))
@@ -15,7 +15,7 @@ class DoctorCertificate(Base):
 
 
 
-class Certificate(Base):
+class Certificate(BaseModel):
     __tablename__ = 'certificate'
     certificate_name = Column(String, nullable=False)
     certificate_code = Column(String, nullable=False, unique=True)
