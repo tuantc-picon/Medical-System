@@ -33,5 +33,3 @@ async def register_patient(
     db: AsyncSession = Depends(get_async_db_session)
 ):
     return await services.register_patient(patient, db)
-
-
