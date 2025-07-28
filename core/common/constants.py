@@ -33,3 +33,4 @@ class RoleEnum(Enum):
 class StatusInvoiceEnum(Enum):
     UNFINISHED = "unfinished"
     COMPLETED = "completed"
+    ASC = -1
