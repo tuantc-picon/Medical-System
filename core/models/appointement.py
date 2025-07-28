@@ -1,12 +1,11 @@
-import enum
 from sqlalchemy import Integer, String, DateTime, Column, ForeignKey, func, Enum
 from sqlalchemy.orm import relationship
-from . import Base, StatusAppointmentEnum
+from core.common.Base import BaseModel
+from core.common.constants import StatusAppointmentEnum
 
 
-class Appointment(Base):
+class Appointment(BaseModel):
     __tablename__ = 'appointment'
-    id = Column(Integer, primary_key=True)
     # Forkey
     patient_id = Column(Integer, ForeignKey('patient.id'))
     doctor_id = Column(Integer,ForeignKey('doctor.id'))
@@ -15,8 +14,6 @@ class Appointment(Base):
     cancel_reason = Column(String, nullable=False)
     diagnosis = Column(String)
     medical_notes = Column(String)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     # relationship Appointment
     doctor = relationship("Doctor", back_populates="appointments")
     patient = relationship("Patient", back_populates="appointments")
@@ -25,23 +22,20 @@ class Appointment(Base):
     invoice_medical = relationship("InvoiceMedical", back_populates="appointment")
 
 
-class ScheduleDoctor(Base):
+class ScheduleDoctor(BaseModel):
     __tablename__ = 'schedule_doctor'
-    id = Column(Integer, primary_key=True)
     # Forkey
     doctor_id = Column(Integer, ForeignKey('doctor.id'))
 
     start_time = Column(DateTime(timezone=True), nullable=False)
     end_time = Column(DateTime(timezone=True), nullable=False)
     note = Column(String)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     #relationship
     doctor = relationship("Doctor", back_populates="schedules")
 
 
 
-class Hospitalization(Base):
+class Hospitalization(BaseModel):
     __tablename__ = 'hospitalization'
     id = Column(Integer, primary_key=True)
     # Forkey
@@ -49,8 +43,6 @@ class Hospitalization(Base):
 
     room_number = Column(Integer, nullable=False)
     bed_number = Column(Integer, nullable=False)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     # relationship
     appointment = relationship(Appointment, back_populates="hospitalization", uselist=False)
     invoice_hospitalized = relationship("InvoiceHospitalized", back_populates="hospitalization")
