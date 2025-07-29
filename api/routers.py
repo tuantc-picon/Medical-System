@@ -22,6 +22,7 @@ router.include_router(users_v2)
 
 
 
+
 @router.get("/health")
 def health_check():
     return {"status": "healthy"}
