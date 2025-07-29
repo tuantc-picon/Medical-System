@@ -1,19 +1,35 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, status, HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
 
-# Create the router instance
-router = APIRouter()
+from app.users.schemas.doctor import DoctorCreate
+from app.users.schemas.patient import PatientCreate
+from app.users.schemas.admin import AdminCreate
+from core.services.register import Register
 
-# Define your routes
-@router.get("/example")
-def get_example():
-    return {"message": "This is an example endpoint"}
+from . import get_async_db_session
 
-# Add more route handlers as needed
-@router.post("/items")
-def create_item():
-    return {"message": "Item created"}
+router = APIRouter(
+    prefix="/v1/users",
+    tags=["Register"]
+)
+@router.post("/register/admin", status_code=status.HTTP_201_CREATED)
+async def register_admin(
+    admin: AdminCreate,
+    db: AsyncSession = Depends(get_async_db_session)
+):
+    return await Register.admin(admin, db)
 
-# You can organize routes by category
-@router.get("/users")
-def get_users():
-    return {"users": ["user1", "user2"]}
+@router.post("/register/doctor", status_code=status.HTTP_201_CREATED)
+async def register_doctor(
+    doctor: DoctorCreate,
+    db: AsyncSession = Depends(get_async_db_session)
+):
+    return await Register.doctor(doctor, db)
+
+
+@router.post("/register/patient", status_code=status.HTTP_201_CREATED)
+async def register_patient(
+    patient: PatientCreate,
+    db: AsyncSession = Depends(get_async_db_session)
+):
+    return await Register.patient(patient, db)
