@@ -18,6 +18,7 @@ class User(BaseModel):
         'polymorphic_on': role, # cột định danh -> lấy cột nào để xác định.
         'polymorphic_identity': RoleEnum # cột nhận diện -> admin, doctor, patient
     }
+    list_tokens = relationship("ListToken", back_populates="user", lazy="selectin")
 
 
 class Admin(User):
@@ -29,6 +30,8 @@ class Admin(User):
     __mapper_args__ = {
         'polymorphic_identity': RoleEnum.ADMIN
     }
+
+
 
 class Doctor(User):
     __tablename__ = 'doctor'
