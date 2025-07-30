@@ -23,3 +23,8 @@ class UserUpdate(MSBaseSchema):
     gender: Optional[GenderEnum] = None
     age: Optional[int] = None
     password: str
+
+
+class UserLogin(MSBaseSchema):
+    email: EmailStr
+    password: str

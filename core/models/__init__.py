@@ -7,3 +7,4 @@ from .prescription import Prescription, PrescriptionDetail
 from .medicine import Medicine, MedicineBatch, DrugAllergy
 from .certificate import DoctorCertificate, Certificate
 from .invoice import InvoicePrescription, InvoiceMedical, InvoiceHospitalized
+from .token import ListToken
