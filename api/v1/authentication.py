@@ -7,24 +7,25 @@ from app.users.schemas.user import UserLogin
 from core.common.database import get_async_db_session
 from core.services.authention import AuthentionService
 
-Login = APIRouter(
-    tags=["authentication"]
+authentication = APIRouter(
+    prefix="/v1",
+    tags=["Authentication"]
 )
 
 
-@Login.post("/login")
+@authentication.post("/login")
 async def login(request: UserLogin, db: AsyncSession = Depends(get_async_db_session)):
     auth_service = AuthentionService(db)
     return await auth_service.login(request)
 
 
-@Login.post("/logout")
+@authentication.post("/logout")
 async def logout(access_token: str, refresh_access_token: str, db: AsyncSession = Depends(get_async_db_session)):
     auth_service = AuthentionService(db)
     return await auth_service.logout(access_token, refresh_access_token)
 
 
-@Login.post("/refresh")
+@authentication.post("/refresh")
 async def refresh_token(refresh_access_token: str, db: AsyncSession = Depends(get_async_db_session)):
     auth_service = AuthentionService(db)
     return await auth_service.refresh_token(refresh_access_token)
