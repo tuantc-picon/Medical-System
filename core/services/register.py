@@ -1,15 +1,16 @@
 from app.users.schemas import doctor, patient, admin
+from core.common.Base import BaseService
 from core.common.constants import RoleEnum
 from core.models.user import Doctor, Patient, Admin
 from core.utils.hashing import Hash
-from core.common.Base import BaseService
+
 
 class Register(BaseService):
     async def admin(self, user_data: admin.AdminCreate):
         new_admin = Admin(
             name=user_data.name,
             email=user_data.email,
-            password = Hash.bcrypt(user_data.password),
+            password=Hash.bcrypt(user_data.password),
             gender=user_data.gender,
             age=user_data.age,
             role=RoleEnum.ADMIN,
@@ -23,7 +24,7 @@ class Register(BaseService):
         new_patient = Patient(
             name=user_data.name,
             email=user_data.email,
-            password = Hash.bcrypt(user_data.password),
+            password=Hash.bcrypt(user_data.password),
             gender=user_data.gender,
             age=user_data.age,
             role=RoleEnum.PATIENT,
@@ -37,7 +38,7 @@ class Register(BaseService):
         new_doctor = Doctor(
             name=user_data.name,
             email=user_data.email,
-            password = Hash.bcrypt(user_data.password),
+            password=Hash.bcrypt(user_data.password),
             gender=user_data.gender,
             age=user_data.age,
             role=RoleEnum.DOCTOR,

@@ -1,3 +1,5 @@
+import asyncio
+
 import uvicorn
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
@@ -6,8 +8,8 @@ from sqlalchemy.exc import SQLAlchemyError
 from starlette.middleware.cors import CORSMiddleware
 
 import config
-from api.routers import router
 from api.common.handlers import base_error_handler, sqlalchemy_exception_handler, validation_exception_handler
+from api.routers import router
 from core.common.exceptions import MSBaseException
 
 app = FastAPI(
@@ -31,6 +33,16 @@ app.add_exception_handler(Exception, base_error_handler)
 
 app.include_router(router, prefix="/api")
 
+
+@app.on_event("startup")
+async def startup():
+    from core.utils.token import Token
+    from core.common.database import get_async_db_session
+
+    session = await anext(get_async_db_session())
+    token_service = Token(db=session)
+
+    asyncio.create_task(token_service.clean_expired_token())
 
 
 if __name__ == "__main__":

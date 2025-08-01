@@ -1,5 +1,6 @@
-from sqlalchemy import Integer, String, DateTime, Column, ForeignKey, func, Enum
+from sqlalchemy import Integer, String, DateTime, Column, ForeignKey, Enum
 from sqlalchemy.orm import relationship
+
 from core.common.Base import BaseModel
 from core.common.constants import StatusAppointmentEnum
 
@@ -8,7 +9,7 @@ class Appointment(BaseModel):
     __tablename__ = 'appointment'
     # Forkey
     patient_id = Column(Integer, ForeignKey('patient.id'))
-    doctor_id = Column(Integer,ForeignKey('doctor.id'))
+    doctor_id = Column(Integer, ForeignKey('doctor.id'))
 
     status = Column(Enum(StatusAppointmentEnum), nullable=False)
     cancel_reason = Column(String, nullable=False)
@@ -30,9 +31,8 @@ class ScheduleDoctor(BaseModel):
     start_time = Column(DateTime(timezone=True), nullable=False)
     end_time = Column(DateTime(timezone=True), nullable=False)
     note = Column(String)
-    #relationship
+    # relationship
     doctor = relationship("Doctor", back_populates="schedules")
-
 
 
 class Hospitalization(BaseModel):
@@ -46,4 +46,3 @@ class Hospitalization(BaseModel):
     # relationship
     appointment = relationship(Appointment, back_populates="hospitalization", uselist=False)
     invoice_hospitalized = relationship("InvoiceHospitalized", back_populates="hospitalization")
-

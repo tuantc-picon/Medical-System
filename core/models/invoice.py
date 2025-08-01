@@ -1,8 +1,9 @@
-from sqlalchemy import Column, Integer, DateTime, ForeignKey, Enum, func
+from sqlalchemy import Column, Integer, DateTime, ForeignKey, Enum
 from sqlalchemy.orm import relationship
 
-from . import StatusInvoiceEnum, Appointment
 from core.common.Base import BaseModel
+from . import StatusInvoiceEnum, Appointment
+
 
 class InvoicePrescription(BaseModel):
     __tablename__ = 'invoice_prescription'

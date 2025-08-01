@@ -26,14 +26,12 @@ AsyncSessionLocal = async_sessionmaker(
     bind=async_engine,
 )
 
-
 engine = create_engine(
     DATABASE_CONN_URL,
     pool_size=DATABASE_CONN_POOL_SIZE,
     pool_pre_ping=True,
 )
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
 
 async_scope_engine = create_async_engine(
     ASYNC_DATABASE_CONN_URL,

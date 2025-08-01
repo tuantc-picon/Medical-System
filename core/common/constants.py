@@ -16,12 +16,10 @@ class StatusAppointmentEnum(Enum):
     CANCELLED = "cancelled"
 
 
-
 class GenderEnum(Enum):
     MALE = "male"
     FEMALE = "female"
     OTHER = "other"
-
 
 
 class RoleEnum(Enum):
