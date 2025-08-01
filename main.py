@@ -37,10 +37,7 @@ app.include_router(router, prefix="/api")
 @app.on_event("startup")
 async def startup():
     from core.utils.token import Token
-    from core.common.database import get_async_db_session
-
-    session = await anext(get_async_db_session())
-    token_service = Token(db=session)
+    token_service = Token()
 
     asyncio.create_task(token_service.clean_expired_token())
 

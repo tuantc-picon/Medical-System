@@ -2,6 +2,8 @@ from fastapi import HTTPException, status
 from sqlalchemy import Column, Integer, DateTime, func, select, and_, String
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import declarative_base
+from typing import Optional
+from sqlalchemy.ext.asyncio import AsyncSession
 
 Base = declarative_base()
 
@@ -16,7 +18,7 @@ class BaseModel(Base):
 
 
 class BaseService:
-    def __init__(self, db):
+    def __init__(self, db: Optional[AsyncSession]=None):
         self.db = db
 
     async def _save(self, instance):
@@ -29,7 +31,7 @@ class BaseService:
             await self.db.rollback()
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Email already exists or violates a constraint."
+                detail="already exists or violates a constraint."
             )
         except Exception as e:
             await self.db.rollback()

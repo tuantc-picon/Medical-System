@@ -15,6 +15,7 @@ from core.common.Base import BaseService
 from core.models.token import ListToken
 from core.models.user import User
 from .number import int_to_datetime
+from core.common.database import get_async_db_session
 
 
 class Token(BaseService):
@@ -83,11 +84,20 @@ class Token(BaseService):
             raise credentials_exception
         return refresh_token_data
 
+
     async def clean_expired_token(self):
+        expired_delta = timedelta(minutes=REFRESH_TOKEN_EXPIRED)
         while True:
-            now = datetime.now(timezone.utc)
-            await self.db.execute(
-                delete(ListToken).where(ListToken.created_at < now - int_to_datetime(REFRESH_TOKEN_EXPIRED))
-            )
-            await self.db.commit()
+            try:
+                async for session in get_async_db_session():
+                    now = datetime.now(timezone.utc)
+                    await session.execute(
+                        delete(ListToken).where(
+                            ListToken.created_at < now - expired_delta
+                        )
+                    )
+                    await session.commit()
+                    break
+            except Exception as e:
+                print(f"[clean_expired_token] Error: {e}")
             await asyncio.sleep(3600)
