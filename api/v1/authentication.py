@@ -8,6 +8,7 @@ from core.common.database import get_async_db_session
 from core.services.authention import AuthentionService
 
 Login = APIRouter(
+    prefix="/v1/authentication",
     tags=["authentication"]
 )
 
