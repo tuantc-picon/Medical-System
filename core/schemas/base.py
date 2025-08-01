@@ -1,15 +1,12 @@
-from typing import Any, List, Optional, Union
-
-from pydantic import BaseModel, ConfigDict
-
-
 from datetime import datetime, date
 from typing import Annotated, Optional
+from typing import List
 from typing import Union, Any, Dict
 from zoneinfo import ZoneInfo
 
 from fastapi import Query
 from pydantic import BaseModel
+from pydantic import ConfigDict
 from pydantic import GetJsonSchemaHandler
 from pydantic_core import CoreSchema
 from pydantic_core.core_schema import ValidationInfo
@@ -45,7 +42,7 @@ class MSTimestamp:
 
     @classmethod
     def validate(
-        cls, value: Union[int, datetime], info: ValidationInfo
+            cls, value: Union[int, datetime], info: ValidationInfo
     ) -> datetime | int | None:
         if value is None:
             return value
@@ -58,7 +55,7 @@ class MSTimestamp:
 
     @classmethod
     def __get_pydantic_json_schema__(
-        cls, core_schema: CoreSchema, handler: GetJsonSchemaHandler
+            cls, core_schema: CoreSchema, handler: GetJsonSchemaHandler
     ) -> Dict[str, Any]:
         return {
             "type": "integer",
@@ -133,7 +130,6 @@ class MSBaseSchema(BaseModel):
         if many:
             return [cls.model_validate(item).model_dump() for item in items]
         return cls.model_validate(items).model_dump()
-
 
     @property
     def data(self):

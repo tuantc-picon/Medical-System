@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, ForeignKey, String, DateTime
 from sqlalchemy.orm import relationship
-from core.common.Base import BaseModel
 
+from core.common.Base import BaseModel
 
 
 class PrescriptionDetail(BaseModel):

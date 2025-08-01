@@ -1,7 +1,10 @@
-from . import MSBaseSchema, MSTimestamp
-from . import GenderEnum, RoleEnum
 from typing import Optional
+
 from pydantic import EmailStr
+
+from . import GenderEnum
+from . import MSBaseSchema, MSTimestamp
+
 
 class UserBase(MSBaseSchema):
     name: str
@@ -13,9 +16,11 @@ class UserBase(MSBaseSchema):
 class UserCreate(UserBase):
     password: str
 
+
 class UserRead(UserBase):
     created_at: MSTimestamp
     updated_at: MSTimestamp
+
 
 class UserUpdate(MSBaseSchema):
     name: Optional[str] = None

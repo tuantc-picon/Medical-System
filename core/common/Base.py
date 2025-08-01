@@ -1,12 +1,13 @@
-from sqlalchemy.orm import declarative_base
-from sqlalchemy import Column, Integer, DateTime, func, select, and_ , String
-from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException, status
+from sqlalchemy import Column, Integer, DateTime, func, select, and_, String
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
 
+
 class BaseModel(Base):
-    __abstract__=True
+    __abstract__ = True
     id = Column(Integer, primary_key=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
@@ -44,6 +45,6 @@ class BaseService:
     async def fetch_one(self, model, **filters):
         stmt = select(model)
         if filters:
-                stmt = stmt.where(and_(*(getattr(model, key) == value for key, value in filters.items())))
+            stmt = stmt.where(and_(*(getattr(model, key) == value for key, value in filters.items())))
         result = await self.db.execute(stmt)
         return result.scalar_one_or_none()
