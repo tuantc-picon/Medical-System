@@ -1,14 +1,16 @@
-from app.users.schemas.schedule import ScheduleDoctorCreate
-from core.common.Base import BaseService
-from core.models import ScheduleDoctor
 from fastapi import HTTPException, status
 from sqlalchemy import select
+
+from app.users.schemas.schedule import ScheduleDoctorCreate
+from core.common.Base import BaseService
+from core.models.schedule import ScheduleDoctor
 
 
 class Schedule(BaseService):
     async def verify_schedule(self, schedule: ScheduleDoctorCreate):
         if schedule.start_time >= schedule.end_time:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="Time slot cannot be greater than time slot.")
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                                detail="Time slot cannot be greater than time slot.")
         try:
             stmt = select(ScheduleDoctor).where(
                 ScheduleDoctor.doctor_id == schedule.doctor_id,
@@ -25,7 +27,6 @@ class Schedule(BaseService):
             raise HTTPException(status_code=status.HTTP_409_CONFLICT,
                                 detail="Schedule conflict detected. Please choose a different time slot.")
         return True
-
 
     async def doctor_for_the_day(self, requires: ScheduleDoctorCreate):
         await self.verify_schedule(requires)

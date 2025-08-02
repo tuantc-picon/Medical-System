@@ -1,9 +1,7 @@
-import asyncio
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 
 from jose import jwt, JWTError
 from pydantic import EmailStr
-from sqlalchemy import delete
 
 from app.users.schemas import AccessTokenData
 from config import (JWT_ACCESS_SECRET_KEY,
@@ -14,8 +12,6 @@ from config import (JWT_ACCESS_SECRET_KEY,
 from core.common.Base import BaseService
 from core.models.token import ListToken
 from core.models.user import User
-from .number import int_to_datetime
-from core.common.database import get_async_db_session
 
 
 class Token(BaseService):
@@ -83,21 +79,3 @@ class Token(BaseService):
         if not refresh_token_data or result_used.deleted_at:
             raise credentials_exception
         return refresh_token_data
-
-
-    async def clean_expired_token(self):
-        expired_delta = timedelta(minutes=REFRESH_TOKEN_EXPIRED)
-        while True:
-            try:
-                async for session in get_async_db_session():
-                    now = datetime.now(timezone.utc)
-                    await session.execute(
-                        delete(ListToken).where(
-                            ListToken.created_at < now - expired_delta
-                        )
-                    )
-                    await session.commit()
-                    break
-            except Exception as e:
-                print(f"[clean_expired_token] Error: {e}")
-            await asyncio.sleep(3600)

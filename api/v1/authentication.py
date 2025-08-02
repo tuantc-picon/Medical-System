@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, status
 # from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -13,19 +13,19 @@ authentication = APIRouter(
 )
 
 
-@authentication.post("/login")
+@authentication.post("/login", status_code=status.HTTP_202_ACCEPTED)
 async def login(request: UserLogin, db: AsyncSession = Depends(get_async_db_session)):
     auth_service = AuthentionService(db)
     return await auth_service.login(request)
 
 
-@authentication.post("/logout")
+@authentication.post("/logout", status_code=status.HTTP_202_ACCEPTED)
 async def logout(access_token: str, refresh_access_token: str, db: AsyncSession = Depends(get_async_db_session)):
     auth_service = AuthentionService(db)
     return await auth_service.logout(access_token, refresh_access_token)
 
 
-@authentication.post("/refresh")
+@authentication.post("/refresh", status_code=status.HTTP_202_ACCEPTED)
 async def refresh_token(refresh_access_token: str, db: AsyncSession = Depends(get_async_db_session)):
     auth_service = AuthentionService(db)
     return await auth_service.refresh_token(refresh_access_token)

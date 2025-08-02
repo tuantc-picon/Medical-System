@@ -41,7 +41,7 @@ class AuthentionService(BaseService):
             "refresh_token": refresh_token,
             "role": query_user.role.value,
             "token_type": "Bearer"
-        }
+        }  # returned in API response body => oauth2 standard
 
     async def login(self, request: UserLogin):
         query_user = await self.fetch_one(User, email=request.email)
