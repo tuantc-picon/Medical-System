@@ -1,4 +1,4 @@
-from sqlalchemy import Integer, String, DateTime, Column, ForeignKey, Enum
+from sqlalchemy import Integer, String, Column, ForeignKey, Enum
 from sqlalchemy.orm import relationship
 
 from core.common.Base import BaseModel
@@ -21,18 +21,6 @@ class Appointment(BaseModel):
     prescription = relationship("Prescription", back_populates="appointments")
     hospitalization = relationship("Hospitalization", back_populates="appointment")
     invoice_medical = relationship("InvoiceMedical", back_populates="appointment")
-
-
-class ScheduleDoctor(BaseModel):
-    __tablename__ = 'schedule_doctor'
-    # Forkey
-    doctor_id = Column(Integer, ForeignKey('doctor.id'))
-
-    start_time = Column(DateTime(timezone=True), nullable=False)
-    end_time = Column(DateTime(timezone=True), nullable=False)
-    note = Column(String)
-    # relationship
-    doctor = relationship("Doctor", back_populates="schedules")
 
 
 class Hospitalization(BaseModel):
