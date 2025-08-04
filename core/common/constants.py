@@ -22,12 +22,19 @@ class GenderEnum(Enum):
     OTHER = "other"
 
 
-class RoleEnum(Enum):
-    ADMIN = "ADMIN"
-    DOCTOR = "DOCTOR"
-    PATIENT = "PATIENT"
-
-
 class StatusInvoiceEnum(Enum):
     UNFINISHED = "unfinished"
     COMPLETED = "completed"
+
+
+class Role(str, Enum):
+    ADMIN = "admin"
+    DOCTOR = "doctor"
+    PATIENT = "patient"
+
+
+ROLE_HIERARCHY = {
+    Role.ADMIN: 3,
+    Role.DOCTOR: 2,
+    Role.PATIENT: 1
+}

@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String, ForeignKey, Enum
 from sqlalchemy.orm import relationship
 
 from core.common.Base import BaseModel
-from . import RoleEnum, GenderEnum
+from core.common.constants import Role, GenderEnum
 
 
 class User(BaseModel):
@@ -12,11 +12,11 @@ class User(BaseModel):
     password = Column(String, nullable=False)
     gender = Column(Enum(GenderEnum), nullable=False)
     age = Column(Integer)
-    role = Column(Enum(RoleEnum), nullable=False)
+    role = Column(Enum(Role), nullable=False)
 
     __mapper_args__ = {
         'polymorphic_on': role,  # cột định danh -> lấy cột nào để xác định.
-        'polymorphic_identity': RoleEnum  # cột nhận diện -> admin, doctor, patient
+        'polymorphic_identity': Role  # cột nhận diện -> admin, doctor, patient
     }
     list_tokens = relationship("ListToken", back_populates="user", lazy="selectin")
 
@@ -28,7 +28,7 @@ class Admin(User):
     address = Column(String, nullable=False)
 
     __mapper_args__ = {
-        'polymorphic_identity': RoleEnum.ADMIN
+        'polymorphic_identity': Role.ADMIN
     }
 
 
@@ -38,7 +38,7 @@ class Doctor(User):
     specialization = Column(String, nullable=False)
     graduated_at = Column(String, nullable=False)
     __mapper_args__ = {
-        'polymorphic_identity': RoleEnum.DOCTOR
+        'polymorphic_identity': Role.DOCTOR
     }
     # relationship Doctor
     appointments = relationship("Appointment", back_populates="doctor")
@@ -52,7 +52,7 @@ class Patient(User):
     job = Column(String)
     insurance_number = Column(String)
     __mapper_args__ = {
-        'polymorphic_identity': RoleEnum.PATIENT
+        'polymorphic_identity': Role.PATIENT
     }
     # relation Patient
     appointments = relationship("Appointment", back_populates="patient")
