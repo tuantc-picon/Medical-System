@@ -2,8 +2,8 @@ from typing import Optional
 
 from pydantic import EmailStr
 
-from . import GenderEnum
-from . import MSBaseSchema, MSTimestamp
+from core.common.constants import GenderEnum
+from core.schemas.base import MSBaseSchema, MSTimestamp
 
 
 class UserBase(MSBaseSchema):

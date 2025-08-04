@@ -1,9 +1,10 @@
+from typing import Optional
+
 from fastapi import HTTPException, status
 from sqlalchemy import Column, Integer, DateTime, func, select, and_, String
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import declarative_base
-from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
 
@@ -18,7 +19,7 @@ class BaseModel(Base):
 
 
 class BaseService:
-    def __init__(self, db: Optional[AsyncSession]=None):
+    def __init__(self, db: Optional[AsyncSession] = None):
         self.db = db
 
     async def _save(self, instance):
@@ -31,13 +32,13 @@ class BaseService:
             await self.db.rollback()
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="already exists or violates a constraint."
+                detail=f"Integrity error: {str(e.orig)}"
             )
         except Exception as e:
             await self.db.rollback()
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="An unexpected error occurred."
+                detail=f"Unexpected server error: {str(e)}"
             )
 
     async def _delete(self, instance):

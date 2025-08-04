@@ -1,6 +1,6 @@
 from typing import Optional
 
-from . import MSBaseSchema, MSTimestamp
+from core.schemas.base import MSBaseSchema, MSTimestamp
 from .user import UserCreate
 
 

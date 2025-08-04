@@ -14,7 +14,7 @@ schedule = APIRouter(
 
 @schedule.post("/create", status_code=status.HTTP_201_CREATED)
 async def create_schedule_doctor(requires: ScheduleDoctorCreate,
-                                 a=Depends(bearer_scheme),
+                                 need_to_login=Depends(bearer_scheme),
                                  db: AsyncSession = Depends(get_async_db_session)):
     use = ScheduleService(db)
     return await use.doctor_for_the_day(requires)

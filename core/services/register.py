@@ -1,6 +1,6 @@
 from app.users.schemas import doctor, patient, admin
 from core.common.Base import BaseService
-from core.common.constants import RoleEnum
+from core.common.constants import Role
 from core.models.user import Doctor, Patient, Admin
 from core.utils.hashing import Hash
 
@@ -13,7 +13,7 @@ class Register(BaseService):
             password=Hash.bcrypt(user_data.password),
             gender=user_data.gender,
             age=user_data.age,
-            role=RoleEnum.ADMIN,
+            role=Role.ADMIN,
             phone_number=user_data.phone_number,
             address=user_data.address
         )
@@ -27,7 +27,7 @@ class Register(BaseService):
             password=Hash.bcrypt(user_data.password),
             gender=user_data.gender,
             age=user_data.age,
-            role=RoleEnum.PATIENT,
+            role=Role.PATIENT,
             job=user_data.job,
             insurance_number=user_data.insurance_number
         )
@@ -41,7 +41,7 @@ class Register(BaseService):
             password=Hash.bcrypt(user_data.password),
             gender=user_data.gender,
             age=user_data.age,
-            role=RoleEnum.DOCTOR,
+            role=Role.DOCTOR,
             specialization=user_data.specialization,
             graduated_at=user_data.graduated_at
         )
