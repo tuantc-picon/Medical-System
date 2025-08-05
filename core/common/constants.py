@@ -27,14 +27,16 @@ class StatusInvoiceEnum(Enum):
     COMPLETED = "completed"
 
 
-class Role(str, Enum):
-    ADMIN = "admin"
-    DOCTOR = "doctor"
-    PATIENT = "patient"
+class HTTPMethodsEnum(str, Enum):
+    GET = "GET"
+    POST = "POST"
+    PUT = "PUT"
+    PATCH = "PATCH"
+    DELETE = "DELETE"
 
 
-ROLE_HIERARCHY = {
-    Role.ADMIN: 3,
-    Role.DOCTOR: 2,
-    Role.PATIENT: 1
-}
+DEFAULT_ROLES = [
+    {"id": 1, "name": "admin"},
+    {"id": 2, "name": "doctor"},
+    {"id": 3, "name": "patient"},
+]

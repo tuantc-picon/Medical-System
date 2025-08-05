@@ -45,16 +45,16 @@ class Token(BaseService):
             payload = jwt.decode(token, JWT_ACCESS_SECRET_KEY, algorithms=[ALGORITHM])
             email: EmailStr = payload.get("subEmail")
             name: str = payload.get("subName")
-            role: str = payload.get("role")
+            role_id: int = payload.get("role_id")
             type: str = payload.get("type")
             if type != "access":
                 raise credentials_exception
 
             result_used = await self.fetch_one(ListToken, access_token=token)
-            if result_used or result_used.deleted_at:
+            if not result_used or result_used.deleted_at:
                 raise credentials_exception
 
-            access_token_data = AccessTokenData(email=email, name=name, role=role)
+            access_token_data = AccessTokenData(email=email, name=name, role_id=role_id)
         except JWTError:
             raise credentials_exception
         return access_token_data
