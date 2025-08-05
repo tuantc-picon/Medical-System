@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 
 
-def int_to_datetime(value: int | float, tz=timezone.utc) -> datetime:
+def change_time_stamp_to_datetime(value: int | float, tz=timezone.utc) -> datetime:
     if not isinstance(value, (int, float)):
         raise ValueError("Value isn't a number (epoch time).")
 
