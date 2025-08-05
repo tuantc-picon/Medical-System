@@ -6,23 +6,28 @@ from . import GenderEnum
 from . import MSBaseSchema, MSTimestamp
 
 
-class UserBase(MSBaseSchema):
+class UserBaseSchema(MSBaseSchema):
     name: str
     email: EmailStr
     gender: GenderEnum
+    role_id: int
+    password: str
     age: Optional[int] = None
 
 
-class UserCreate(UserBase):
-    password: str
+class UserCreateSchema(UserBaseSchema):
+    extra_fields: dict
 
+class UserResponseSchema(UserBaseSchema):
+    id: int
+    extra_fields: dict
 
-class UserRead(UserBase):
+class UserReadSchema(UserBaseSchema):
     created_at: MSTimestamp
     updated_at: MSTimestamp
 
 
-class UserUpdate(MSBaseSchema):
+class UserUpdateSchema(MSBaseSchema):
     name: Optional[str] = None
     email: Optional[EmailStr] = None
     gender: Optional[GenderEnum] = None
@@ -30,6 +35,6 @@ class UserUpdate(MSBaseSchema):
     password: str
 
 
-class UserLogin(MSBaseSchema):
+class UserLoginSchema(MSBaseSchema):
     email: EmailStr
     password: str

@@ -1,31 +1,37 @@
 from fastapi import APIRouter, status
-# from fastapi.security.oauth2 import OAuth2PasswordRequestForm
+
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.users.schemas.user import UserLogin
+from app.users.schemas.user import UserLoginSchema
 from core.common.database import get_async_db_session
 from core.services.authention import AuthentionService
+from core.utils.bearer import get_access_token
 
-authentication = APIRouter(
-    prefix="/v1",
-    tags=["Authentication"]
-)
+authentication = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
-@authentication.post("/login", status_code=status.HTTP_202_ACCEPTED)
-async def login(request: UserLogin, db: AsyncSession = Depends(get_async_db_session)):
+@authentication.post("/login", status_code=status.HTTP_200_OK)
+async def login_user(
+    request: UserLoginSchema,
+    db: AsyncSession = Depends(get_async_db_session),
+):
     auth_service = AuthentionService(db)
-    return await auth_service.login(request)
+    return await auth_service.login_user(request)
 
 
-@authentication.post("/logout", status_code=status.HTTP_202_ACCEPTED)
-async def logout(access_token: str, refresh_access_token: str, db: AsyncSession = Depends(get_async_db_session)):
+@authentication.get("/logout", status_code=status.HTTP_200_OK)
+async def logout_user(
+    access_token=Depends(get_access_token),
+    db: AsyncSession = Depends(get_async_db_session),
+):
     auth_service = AuthentionService(db)
-    return await auth_service.logout(access_token, refresh_access_token)
+    return await auth_service.logout_user(access_token)
 
 
-@authentication.post("/refresh", status_code=status.HTTP_202_ACCEPTED)
-async def refresh_token(refresh_access_token: str, db: AsyncSession = Depends(get_async_db_session)):
+@authentication.post("/refresh", status_code=status.HTTP_200_OK)
+async def renew_token(
+    refresh_access_token: str, db: AsyncSession = Depends(get_async_db_session)
+):
     auth_service = AuthentionService(db)
-    return await auth_service.refresh_token(refresh_access_token)
+    return await auth_service.renew_token(refresh_access_token)

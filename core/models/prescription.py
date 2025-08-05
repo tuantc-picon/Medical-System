@@ -22,7 +22,6 @@ class PrescriptionDetail(BaseModel):
 class Prescription(BaseModel):
     __tablename__ = 'prescription'
 
-    id = Column(Integer, primary_key=True)
     appointment_id = Column(Integer, ForeignKey('appointment.id'))
 
     Dosage = Column(String)

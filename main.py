@@ -37,9 +37,10 @@ app.include_router(router, prefix="/api")
 @app.on_event("startup")
 async def startup():
     from core.services.clean_table import clean_table
-
     asyncio.create_task(clean_table.clean_expired_token())
     asyncio.create_task(clean_table.clean_schedule_doctor_expired())
+    from core.utils.initial_data import init_roles
+    asyncio.create_task(init_roles())
 
 
 if __name__ == "__main__":
