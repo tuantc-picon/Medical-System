@@ -11,7 +11,7 @@ class Token(MSBaseSchema):
 class AccessTokenData(MSBaseSchema):
     email: EmailStr
     name: str
-    role: str
+    role_id: int
 
 
 class RefreshTokenData(MSBaseSchema):

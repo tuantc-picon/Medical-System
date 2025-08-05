@@ -1,20 +1,18 @@
-
-from logging.config import fileConfig
-
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
-
-from alembic import context
-
 import os
 import sys
+from logging.config import fileConfig
+
+from alembic import context
+from sqlalchemy import engine_from_config
+from sqlalchemy import pool
+from core.models import *
+
+from core.common.Base import Base
+
 sys.path.append(os.getcwd())
 from config import DATABASE_CONN_URL
-from core.models import Base
-
 
 config = context.config
-
 
 config.set_main_option("sqlalchemy.url", DATABASE_CONN_URL)
 print("DATABASE_CONN_URL:", DATABASE_CONN_URL)
@@ -23,7 +21,6 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 target_metadata = Base.metadata
-
 
 
 def run_migrations_offline() -> None:

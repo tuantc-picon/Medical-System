@@ -17,7 +17,7 @@ class AuthentionService(BaseService):
             access_token = Token.create_access_token(data={
                 "subEmail": query_user.email,
                 "subName": query_user.name,
-                "role": query_user.role.value})
+                "role_id": query_user.role_id})
             refresh_token = Token.create_refresh_token(data={
                 "subID": query_user.id,
                 "subEmail": query_user.email
@@ -39,7 +39,6 @@ class AuthentionService(BaseService):
         return {
             "access_token": access_token,
             "refresh_token": refresh_token,
-            "role": query_user.role.value,
             "token_type": "Bearer"
         }  # returned in API response body => oauth2 standard
 

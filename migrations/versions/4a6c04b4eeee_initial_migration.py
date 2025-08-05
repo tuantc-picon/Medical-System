@@ -1,8 +1,8 @@
-"""first
+"""Initial migration 
 
-Revision ID: 3ce0b9c56f8e
+Revision ID: 4a6c04b4eeee
 Revises: 
-Create Date: 2025-08-01 14:41:02.941301
+Create Date: 2025-08-04 22:43:56.184667
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '3ce0b9c56f8e'
+revision: str = '4a6c04b4eeee'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -43,18 +43,69 @@ def upgrade() -> None:
     sa.Column('deleted_by', sa.String(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('users',
-    sa.Column('name', sa.String(), nullable=False),
-    sa.Column('email', sa.String(), nullable=False),
-    sa.Column('password', sa.String(), nullable=False),
-    sa.Column('gender', sa.Enum('MALE', 'FEMALE', 'OTHER', name='genderenum'), nullable=False),
-    sa.Column('age', sa.Integer(), nullable=True),
-    sa.Column('role', sa.Enum('ADMIN', 'DOCTOR', 'PATIENT', name='roleenum'), nullable=False),
+    op.create_table('menu',
+    sa.Column('path', sa.String(), nullable=False),
+    sa.Column('description', sa.String(), nullable=True),
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
     sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),
     sa.Column('deleted_at', sa.DateTime(timezone=True), nullable=True),
     sa.Column('deleted_by', sa.String(), nullable=True),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('path')
+    )
+    op.create_table('role',
+    sa.Column('name', sa.String(), nullable=False),
+    sa.Column('description', sa.String(), nullable=True),
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
+    sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),
+    sa.Column('deleted_at', sa.DateTime(timezone=True), nullable=True),
+    sa.Column('deleted_by', sa.String(), nullable=True),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('name')
+    )
+    op.create_table('medicine',
+    sa.Column('medicine_batch_id', sa.Integer(), nullable=True),
+    sa.Column('Medicine_name', sa.String(), nullable=False),
+    sa.Column('price_unit', sa.Integer(), nullable=False),
+    sa.Column('quantity', sa.Integer(), nullable=False),
+    sa.Column('unit', sa.String(), nullable=False),
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
+    sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),
+    sa.Column('deleted_at', sa.DateTime(timezone=True), nullable=True),
+    sa.Column('deleted_by', sa.String(), nullable=True),
+    sa.ForeignKeyConstraint(['medicine_batch_id'], ['medicine_batch.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('role_menu',
+    sa.Column('role_id', sa.Integer(), nullable=True),
+    sa.Column('menu_id', sa.Integer(), nullable=True),
+    sa.Column('list_method', sa.ARRAY(sa.String()), nullable=True),
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
+    sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),
+    sa.Column('deleted_at', sa.DateTime(timezone=True), nullable=True),
+    sa.Column('deleted_by', sa.String(), nullable=True),
+    sa.ForeignKeyConstraint(['menu_id'], ['menu.id'], ),
+    sa.ForeignKeyConstraint(['role_id'], ['role.id'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('menu_id', 'role_id', name='uq_menu_role')
+    )
+    op.create_table('users',
+    sa.Column('role_id', sa.Integer(), nullable=False),
+    sa.Column('name', sa.String(), nullable=False),
+    sa.Column('email', sa.String(), nullable=False),
+    sa.Column('password', sa.String(), nullable=False),
+    sa.Column('gender', sa.Enum('MALE', 'FEMALE', 'OTHER', name='genderenum'), nullable=False),
+    sa.Column('age', sa.Integer(), nullable=True),
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
+    sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),
+    sa.Column('deleted_at', sa.DateTime(timezone=True), nullable=True),
+    sa.Column('deleted_by', sa.String(), nullable=True),
+    sa.ForeignKeyConstraint(['role_id'], ['role.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email')
     )
@@ -86,20 +137,6 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('access_token'),
     sa.UniqueConstraint('refresh_token')
-    )
-    op.create_table('medicine',
-    sa.Column('medicine_batch_id', sa.Integer(), nullable=True),
-    sa.Column('Medicine_name', sa.String(), nullable=False),
-    sa.Column('price_unit', sa.Integer(), nullable=False),
-    sa.Column('quantity', sa.Integer(), nullable=False),
-    sa.Column('unit', sa.String(), nullable=False),
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
-    sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),
-    sa.Column('deleted_at', sa.DateTime(timezone=True), nullable=True),
-    sa.Column('deleted_by', sa.String(), nullable=True),
-    sa.ForeignKeyConstraint(['medicine_batch_id'], ['medicine_batch.id'], ),
-    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('patient',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -256,11 +293,14 @@ def downgrade() -> None:
     op.drop_table('doctor_certificate')
     op.drop_table('appointment')
     op.drop_table('patient')
-    op.drop_table('medicine')
     op.drop_table('list_token')
     op.drop_table('doctor')
     op.drop_table('admin')
     op.drop_table('users')
+    op.drop_table('role_menu')
+    op.drop_table('medicine')
+    op.drop_table('role')
+    op.drop_table('menu')
     op.drop_table('medicine_batch')
     op.drop_table('certificate')
     # ### end Alembic commands ###

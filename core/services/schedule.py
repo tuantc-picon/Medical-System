@@ -4,6 +4,7 @@ from sqlalchemy import select
 from app.users.schemas.schedule import ScheduleDoctorCreate
 from core.common.Base import BaseService
 from core.models.schedule import ScheduleDoctor
+from app.users.schemas.schedule import ScheduleDoctorCreate
 
 
 class Schedule(BaseService):
@@ -40,4 +41,4 @@ class Schedule(BaseService):
             note=requires.note
         )
         await self._save(new_schedule)
-        return new_schedule
+        return requires

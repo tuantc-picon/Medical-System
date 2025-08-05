@@ -12,6 +12,9 @@ class ScheduleDoctorCreate(MSBaseSchema):
     end_time: datetime
     note: Optional[str] = None
 
+    class Config:
+        from_attributes = True
+
     @model_validator(mode="before")
     def validate_time(cls, values: dict):
         start = values.get('start_time')
