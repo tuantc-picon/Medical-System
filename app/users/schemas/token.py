@@ -3,17 +3,17 @@ from pydantic import EmailStr
 from core.schemas.base import MSBaseSchema
 
 
-class Token(MSBaseSchema):
+class TokenSchema(MSBaseSchema):
     access_token: str
     token_type: str
 
 
-class AccessTokenData(MSBaseSchema):
+class AccessTokenDataSchema(MSBaseSchema):
     email: EmailStr
     name: str
-    role: str
+    role_id: int
 
 
-class RefreshTokenData(MSBaseSchema):
+class RefreshTokenDataSchema(MSBaseSchema):
     email: EmailStr
     id: int

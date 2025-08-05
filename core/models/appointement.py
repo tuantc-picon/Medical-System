@@ -12,7 +12,7 @@ class Appointment(BaseModel):
     doctor_id = Column(Integer, ForeignKey('doctor.id'))
 
     status = Column(Enum(StatusAppointmentEnum), nullable=False)
-    cancel_reason = Column(String, nullable=False)
+    cancel_reason = Column(String)
     diagnosis = Column(String)
     medical_notes = Column(String)
     # relationship Appointment
@@ -37,7 +37,6 @@ class ScheduleDoctor(BaseModel):
 
 class Hospitalization(BaseModel):
     __tablename__ = 'hospitalization'
-    id = Column(Integer, primary_key=True)
     # Forkey
     appointment_id = Column(Integer, ForeignKey('appointment.id'), unique=True)
 

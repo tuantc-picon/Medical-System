@@ -27,14 +27,13 @@ class StatusInvoiceEnum(Enum):
     COMPLETED = "completed"
 
 
-class Role(str, Enum):
-    ADMIN = "admin"
-    DOCTOR = "doctor"
-    PATIENT = "patient"
+class DefaultRoleEnum(Enum):
+    ADMIN = (1, "admin")
+    DOCTOR = (2, "doctor")
+    PATIENT = (3, "patient")
 
-
-ROLE_HIERARCHY = {
-    Role.ADMIN: 3,
-    Role.DOCTOR: 2,
-    Role.PATIENT: 1
-}
+    def __new__(cls, id: int, name: str):
+        obj = object.__new__(cls)
+        obj.role_id = id
+        obj.role_name = name
+        return obj
