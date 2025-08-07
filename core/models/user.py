@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String, ForeignKey, Enum
 from sqlalchemy.orm import relationship
 
 from core.common.Base import BaseModel
-from core.common.constants import GenderEnum
+from core.common.constants import GenderEnum, DefaultRole
 
 
 class User(BaseModel):
@@ -31,7 +31,7 @@ class Admin(User):
     address = Column(String, nullable=False)
 
     __mapper_args__ = {
-        'polymorphic_identity': 1
+        'polymorphic_identity': DefaultRole.ADMIN.role_id
     }
 
 
@@ -41,7 +41,7 @@ class Doctor(User):
     specialization = Column(String, nullable=False)
     graduated_at = Column(String, nullable=False)
     __mapper_args__ = {
-        'polymorphic_identity': 2
+        'polymorphic_identity': DefaultRole.DOCTOR.role_id
     }
     # relationship Doctor
     appointments = relationship("Appointment", back_populates="doctor")
@@ -55,7 +55,7 @@ class Patient(User):
     job = Column(String)
     insurance_number = Column(String)
     __mapper_args__ = {
-        'polymorphic_identity': 3
+        'polymorphic_identity': DefaultRole.PATIENT.role_id
     }
     # relation Patient
     appointments = relationship("Appointment", back_populates="patient")

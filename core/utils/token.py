@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from fastapi import HTTPException, status
 
 from jose import jwt, JWTError
 from pydantic import EmailStr
@@ -40,7 +41,7 @@ class Token(BaseService):
         expires = timedelta(days=REFRESH_TOKEN_EXPIRED)
         return Token.create_token(to_encode, JWT_REFRESH_SECRET_KEY, expires_delta=expires)
 
-    async def verify_access_token(self, token: str, credentials_exception):
+    async def verify_access_token(self, token: str):
         try:
             payload = jwt.decode(token, JWT_ACCESS_SECRET_KEY, algorithms=[ALGORITHM])
             email: EmailStr = payload.get("subEmail")
@@ -48,34 +49,62 @@ class Token(BaseService):
             role_id: int = payload.get("role_id")
             type: str = payload.get("type")
             if type != "access":
-                raise credentials_exception
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Could not validate credentials",
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
 
             result_used = await self.fetch_one(ListToken, access_token=token)
             if not result_used or result_used.deleted_at:
-                raise credentials_exception
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Could not validate credentials",
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
 
             access_token_data = AccessTokenData(email=email, name=name, role_id=role_id)
         except JWTError:
-            raise credentials_exception
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Could not validate credentials",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
         return access_token_data
 
-    async def verify_refresh_token(self, refreshToken: str, credentials_exception):
+    async def verify_refresh_token(self, refreshToken: str):
         try:
             payload = jwt.decode(refreshToken, JWT_REFRESH_SECRET_KEY, algorithms=[ALGORITHM])
             email: EmailStr = payload.get("subEmail")
             id: int = payload.get("subID")
             type: str = payload.get("type")
             if type != "refresh":
-                raise credentials_exception
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Could not validate credentials",
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
 
             result_used = await self.fetch_one(ListToken, refresh_token=refreshToken)
 
             if not result_used:
-                raise credentials_exception
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Could not validate credentials",
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
         except JWTError:
-            raise credentials_exception
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Could not validate credentials",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
 
         refresh_token_data = await self.fetch_one(User, id=id, email=email)
         if not refresh_token_data or result_used.deleted_at:
-            raise credentials_exception
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Could not validate credentials",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
         return refresh_token_data

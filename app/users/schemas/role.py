@@ -3,7 +3,9 @@ from core.common.constants import HTTPMethodsEnum
 from typing import List
 
 
-class RoleMenuPermissionCreate(MSBaseSchema):
+class RolePermissionCreate(MSBaseSchema):
     role_id: int
-    menu_path: str
-    methods: List[HTTPMethodsEnum]
+    name: str
+
+class RolePermissionRead(RolePermissionCreate):
+    permission_id: int

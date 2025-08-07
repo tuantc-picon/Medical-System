@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, ForeignKey, ARRAY, UniqueConstraint
+from sqlalchemy import Column, String, Integer, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship
 
 from core.common.Base import BaseModel
@@ -9,22 +9,22 @@ class Role(BaseModel):
     name = Column(String, unique=True, nullable=False)
     description = Column(String, nullable=True)
     users = relationship("User", back_populates="role")
-    role_menu = relationship("RoleMenu", back_populates="role")
+    role_permission = relationship("RolePermission", back_populates="role")
 
 
-class Menu(BaseModel):
-    __tablename__ = 'menu'
-    path = Column(String, unique=True, nullable=False)  # example: "/api/v1/patient"
+class Permission(BaseModel):
+    __tablename__ = 'permissions'  # user:read || user:put || user:deleted || user:post
+    name=Column(String, unique=True, nullable=False)
     description = Column(String, nullable=True)
-    role_menu = relationship("RoleMenu", back_populates="menu")
+    role_permission = relationship("RolePermission", back_populates="permission")
 
 
-class RoleMenu(BaseModel):
-    __tablename__ = 'role_menu'
+class RolePermission(BaseModel):
+    __tablename__ = 'role_permission'
     role_id = Column(Integer, ForeignKey('role.id'))
-    menu_id = Column(Integer, ForeignKey('menu.id'))
-    list_method = Column(ARRAY(String), nullable=True)
-    menu = relationship("Menu", back_populates="role_menu")
-    role = relationship("Role", back_populates="role_menu")
+    permission_id = Column(Integer, ForeignKey('permissions.id'))
 
-    __table_args__ = (UniqueConstraint('menu_id', 'role_id', name='uq_menu_role'),)  # avoid data duplication
+    permission = relationship("Permission", back_populates="role_permission")
+    role = relationship("Role", back_populates="role_permission")
+
+    __table_args__ = (UniqueConstraint('permission_id', 'role_id', name='uq_role_permission'),)  # avoid data duplication

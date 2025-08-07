@@ -35,8 +35,17 @@ class HTTPMethodsEnum(str, Enum):
     DELETE = "DELETE"
 
 
-DEFAULT_ROLES = [
-    {"id": 1, "name": "admin"},
-    {"id": 2, "name": "doctor"},
-    {"id": 3, "name": "patient"},
-]
+class DefaultRole(Enum):
+    ADMIN = (1, "admin")
+    DOCTOR = (2, "doctor")
+    PATIENT = (3, "patient")
+
+    def __new__(cls, id: int, name: str):
+        obj = object.__new__(cls)
+        obj.role_id = id
+        obj.role_name = name
+        return obj
+
+
+def count_default_roles() -> int:
+    return len(DefaultRole)
