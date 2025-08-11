@@ -1,6 +1,5 @@
 from enum import Enum
 
-
 PASSWORD_REGEX = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$"
 
 
@@ -38,16 +37,3 @@ class DefaultRoleEnum(Enum):
         obj.role_id = id
         obj.role_name = name
         return obj
-
-    @classmethod  # help with member variables
-    def get_schema_by_role_id(cls, role_id):
-        from app.users.schemas.admin import AdminReadSchema
-        from app.users.schemas.doctor import DoctorReadSchema
-        from app.users.schemas.patient import PatientReadSchema
-
-        mapping = {
-            cls.ADMIN.role_id: AdminReadSchema,
-            cls.DOCTOR.role_id: DoctorReadSchema,
-            cls.PATIENT.role_id: PatientReadSchema,
-        }
-        return mapping.get(role_id, None)
