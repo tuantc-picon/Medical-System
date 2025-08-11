@@ -8,6 +8,7 @@ class ScheduleDoctor(BaseModel):
     __tablename__ = 'schedule_doctor'
     # Forkey
     doctor_id = Column(Integer, ForeignKey('doctor.id'))
+    __table_args__ = {'extend_existing': True}
 
     start_time = Column(DateTime(timezone=True), nullable=False)
     end_time = Column(DateTime(timezone=True), nullable=False)
