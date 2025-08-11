@@ -1,23 +1,23 @@
 from typing import Optional
 
-from . import MSTimestamp, MSBaseSchema
-from .user import UserCreate
+from core.schemas.base import MSBaseSchema, MSTimestamp
+from .user import UserCreateSchema, UserBaseSchema
 
 
-class AdminBase(MSBaseSchema):
+class AdminBaseSchema(MSBaseSchema):
+    phone_number: Optional[str]=None
+    address: Optional[str]=None
+
+
+class AdminCreateSchema(UserCreateSchema, AdminBaseSchema):
     pass
 
 
-class AdminCreate(UserCreate):
-    phone_number: str
-    address: str
-
-
-class AdminRead(AdminBase):
+class AdminReadSchema(UserBaseSchema,AdminBaseSchema):
     created_at: MSTimestamp
     updated_at: MSTimestamp
 
 
-class AdminUpdate():
+class AdminUpdateSchema():
     phone_number: Optional[str]
     address: Optional[str]

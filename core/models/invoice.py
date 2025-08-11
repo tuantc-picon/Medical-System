@@ -2,7 +2,8 @@ from sqlalchemy import Column, Integer, DateTime, ForeignKey, Enum
 from sqlalchemy.orm import relationship
 
 from core.common.Base import BaseModel
-from . import StatusInvoiceEnum, Appointment
+from core.common.constants import StatusInvoiceEnum
+from . import Appointment
 
 
 class InvoicePrescription(BaseModel):
