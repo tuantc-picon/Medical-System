@@ -6,8 +6,8 @@ from core.services.role import RoleService
 from core.utils.authorize import authorize_user
 
 role = APIRouter(
-    prefix="/role",
-    tags=["Role"],
+    prefix="/roles",
+    tags=["Roles"],
 )
 
 

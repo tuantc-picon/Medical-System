@@ -2,23 +2,26 @@ from sqlalchemy import Column, Integer, String, ForeignKey, Enum
 from sqlalchemy.orm import relationship
 
 from core.common.Base import BaseModel
-from . import RoleEnum, GenderEnum
+from core.common.constants import GenderEnum
 
 
 class User(BaseModel):
     __tablename__ = 'users'
+    role_id = Column(Integer, ForeignKey('role.id'), nullable=False)
+
     name = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
     gender = Column(Enum(GenderEnum), nullable=False)
     age = Column(Integer)
-    role = Column(Enum(RoleEnum), nullable=False)
 
     __mapper_args__ = {
-        'polymorphic_on': role,  # cột định danh -> lấy cột nào để xác định.
-        'polymorphic_identity': RoleEnum  # cột nhận diện -> admin, doctor, patient
+        'polymorphic_on': role_id,  # identification column -> which column to use to identify.
+        'with_polymorphic': '*'
+        # load full subclass information when querying User => can query element subclass when query Baseclass
     }
     list_tokens = relationship("ListToken", back_populates="user", lazy="selectin")
+    role = relationship("Role", back_populates="users")
 
 
 class Admin(User):
@@ -28,7 +31,7 @@ class Admin(User):
     address = Column(String, nullable=False)
 
     __mapper_args__ = {
-        'polymorphic_identity': RoleEnum.ADMIN
+        'polymorphic_identity': 1
     }
 
 
@@ -38,7 +41,7 @@ class Doctor(User):
     specialization = Column(String, nullable=False)
     graduated_at = Column(String, nullable=False)
     __mapper_args__ = {
-        'polymorphic_identity': RoleEnum.DOCTOR
+        'polymorphic_identity': 2
     }
     # relationship Doctor
     appointments = relationship("Appointment", back_populates="doctor")
@@ -52,7 +55,7 @@ class Patient(User):
     job = Column(String)
     insurance_number = Column(String)
     __mapper_args__ = {
-        'polymorphic_identity': RoleEnum.PATIENT
+        'polymorphic_identity': 3
     }
     # relation Patient
     appointments = relationship("Appointment", back_populates="patient")

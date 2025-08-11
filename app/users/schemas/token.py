@@ -1,6 +1,6 @@
 from pydantic import EmailStr
 
-from . import MSBaseSchema
+from core.schemas.base import MSBaseSchema
 
 
 class TokenSchema(MSBaseSchema):

@@ -15,9 +15,6 @@ from config import DEFAULT_TIMEZONE_SERVER
 from core.common.constants import SortType
 
 
-# class MSBaseSchema(BaseModel):
-#     pass
-
 class MSPaginationBaseSchema(BaseModel):
     page: Annotated[int, Query(ge=1)] = 1
     limit: Annotated[int, Query(ge=1, le=1000)] = 20
@@ -29,9 +26,7 @@ class MSSortBaseSchema(BaseModel):
     sort_type: Optional[Annotated[int, Query()]] = SortType.ASC
 
 
-class MSSortPaginationBaseSchema(
-    MSSortBaseSchema, MSPaginationBaseSchema
-):
+class MSSortPaginationBaseSchema(MSSortBaseSchema, MSPaginationBaseSchema):
     pass
 
 
@@ -42,7 +37,7 @@ class MSTimestamp:
 
     @classmethod
     def validate(
-            cls, value: Union[int, datetime], info: ValidationInfo
+        cls, value: Union[int, datetime], info: ValidationInfo
     ) -> datetime | int | None:
         if value is None:
             return value
@@ -55,7 +50,7 @@ class MSTimestamp:
 
     @classmethod
     def __get_pydantic_json_schema__(
-            cls, core_schema: CoreSchema, handler: GetJsonSchemaHandler
+        cls, core_schema: CoreSchema, handler: GetJsonSchemaHandler
     ) -> Dict[str, Any]:
         return {
             "type": "integer",
