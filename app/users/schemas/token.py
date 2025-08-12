@@ -9,6 +9,7 @@ class TokenSchema(MSBaseSchema):
 
 
 class AccessTokenDataSchema(MSBaseSchema):
+    id: int
     email: EmailStr
     name: str
     role_id: int

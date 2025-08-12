@@ -46,8 +46,35 @@ class BaseService:
         await self.db.commit()
 
     async def fetch_one(self, model, **filters):
-        stmt = select(model)
-        if filters:
-            stmt = stmt.where(and_(*(getattr(model, key) == value for key, value in filters.items())))
-        result = await self.db.execute(stmt)
+        try:
+            stmt = select(model)
+            if filters:
+                stmt = stmt.where(and_(*(getattr(model, key) == value for key, value in filters.items())))
+            result = await self.db.execute(stmt)
+        except Exception as e:
+            raise e
         return result.scalar_one_or_none()
+
+    async def fetch_all(self, model, offset: Optional[int] = None, limit: Optional[int] = 0, conditions=None):
+        stmt = select(model)
+        if conditions:
+            stmt = stmt.where(*conditions)
+        if offset is not None:
+            stmt = stmt.offset(offset)
+        if limit is not None:
+            stmt = stmt.limit(limit)
+        try:
+            result = await self.db.execute(stmt)
+            return result.scalars().all()
+        except Exception as e:
+            raise e
+
+    @staticmethod
+    def all_none(**filters):
+        if all(value is None for value in filters.values()):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No data")
+
+
+class BaseTimeToDetermine:
+    start_time = Column(DateTime(timezone=True), nullable=False)
+    end_time = Column(DateTime(timezone=True))

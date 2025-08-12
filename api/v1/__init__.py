@@ -9,6 +9,7 @@ from .register import register as router_register
 from .authentication import authentication as router_authentication
 from .schedule import schedule as router_schedule
 from .role import role as router_role
+from .information_user import view as router_view
 
 from fastapi import APIRouter
 
@@ -19,3 +20,4 @@ router_v1.include_router(router_register)
 router_v1.include_router(router_authentication)
 router_v1.include_router(router_schedule)
 router_v1.include_router(router_role)
+router_v1.include_router(router_view)

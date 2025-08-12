@@ -12,11 +12,11 @@ class UserBaseSchema(MSBaseSchema):
     email: EmailStr
     gender: GenderEnum
     role_id: int
-    password: str
     age: Optional[int] = None
 
 
 class UserCreateSchema(UserBaseSchema):
+    password: str
     extra_fields: dict
 
 class UserResponseSchema(UserBaseSchema):
