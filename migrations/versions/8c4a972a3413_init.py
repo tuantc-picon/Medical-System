@@ -1,8 +1,8 @@
 """init
 
-Revision ID: 17a8f553b32f
+Revision ID: 8c4a972a3413
 Revises: 
-Create Date: 2025-08-12 23:15:13.709116
+Create Date: 2025-08-13 01:29:44.753538
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '17a8f553b32f'
+revision: str = '8c4a972a3413'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -64,21 +64,11 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('name')
     )
-    op.create_table('work_schedule_detail',
-    sa.Column('start_time', sa.DateTime(timezone=True), nullable=False),
-    sa.Column('end_time', sa.DateTime(timezone=True), nullable=False),
-    sa.Column('note', sa.String(), nullable=True),
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
-    sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),
-    sa.Column('deleted_at', sa.DateTime(timezone=True), nullable=True),
-    sa.Column('deleted_by', sa.String(), nullable=True),
-    sa.PrimaryKeyConstraint('id')
-    )
     op.create_table('medicine_batch',
     sa.Column('medicine_id', sa.Integer(), nullable=False),
     sa.Column('unit_price', sa.Integer(), nullable=False),
     sa.Column('current_quantity', sa.Integer(), nullable=False),
+    sa.Column('initial_quantity', sa.Integer(), nullable=False),
     sa.Column('note', sa.String(), nullable=True),
     sa.Column('expiry_date', sa.Date(), nullable=False),
     sa.Column('id', sa.Integer(), nullable=False),
@@ -195,16 +185,17 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['patient_id'], ['patient.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('work_schedule',
+    op.create_table('schedule_doctor',
     sa.Column('doctor_id', sa.Integer(), nullable=True),
-    sa.Column('schedule_detail_id', sa.Integer(), nullable=True),
+    sa.Column('start_time', sa.DateTime(timezone=True), nullable=False),
+    sa.Column('end_time', sa.DateTime(timezone=True), nullable=False),
+    sa.Column('note', sa.String(), nullable=True),
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
     sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),
     sa.Column('deleted_at', sa.DateTime(timezone=True), nullable=True),
     sa.Column('deleted_by', sa.String(), nullable=True),
     sa.ForeignKeyConstraint(['doctor_id'], ['doctor.id'], ),
-    sa.ForeignKeyConstraint(['schedule_detail_id'], ['work_schedule_detail.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('hospitalization',
@@ -296,7 +287,7 @@ def downgrade() -> None:
     op.drop_table('prescription')
     op.drop_table('invoice_medical')
     op.drop_table('hospitalization')
-    op.drop_table('work_schedule')
+    op.drop_table('schedule_doctor')
     op.drop_table('drug_allergy')
     op.drop_table('doctor_certificate')
     op.drop_table('appointment')
@@ -307,7 +298,6 @@ def downgrade() -> None:
     op.drop_table('users')
     op.drop_table('role_permission')
     op.drop_table('medicine_batch')
-    op.drop_table('work_schedule_detail')
     op.drop_table('role')
     op.drop_table('permissions')
     op.drop_table('medicine')
