@@ -34,7 +34,7 @@ class ViewInformation(BaseService):
             id: int,
     ):
         user = await self.fetch_one(User, id=id)
-        schema_cls = ROLE_MAPPING_READ(user.role_id)
+        schema_cls = ROLE_MAPPING_READ.get(user.role_id)
         information_detail = schema_cls.model_validate(user)
         return information_detail
 

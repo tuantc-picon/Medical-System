@@ -13,7 +13,7 @@ view = APIRouter(prefix="", tags=["View"])
 
 @view.get("/users", response_model=List[UserReadSchema], status_code=status.HTTP_200_OK)
 async def view_list_users(
-    role_id: int = Query(...),
+    role_id: int = Query(None),
     name: str = Query(None),
     offset: int = Query(0, ge=0),
     limit: int = Query(10, ge=0),
@@ -21,7 +21,7 @@ async def view_list_users(
     authorize=Depends(authorize_user("information_list_user:view")),
 ):
     service = ViewInformation(db=db)
-    return await service.list_user(
+    return await service.get_list_user(
         offset=offset, limit=limit, name=name, role_id=role_id
     )
 
@@ -30,6 +30,7 @@ async def view_list_users(
 async def view_user_details(
     id: int,
     db: AsyncSession = Depends(get_async_db_session),
+    authorize=Depends(authorize_user("information_user:search")),
 ):
     service = ViewInformation(db=db)
     return await service.get_user_details(id)
