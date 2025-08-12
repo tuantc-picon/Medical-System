@@ -18,15 +18,14 @@ class Appointment(BaseModel):
     # relationship Appointment
     doctor = relationship("Doctor", back_populates="appointments")
     patient = relationship("Patient", back_populates="appointments")
-    prescription = relationship("Prescription", back_populates="appointments")
+    prescription = relationship("Prescription", back_populates="appointment", uselist=False)
     hospitalization = relationship("Hospitalization", back_populates="appointment")
     invoice_medical = relationship("InvoiceMedical", back_populates="appointment")
-
 
 class Hospitalization(BaseModel):
     __tablename__ = 'hospitalization'
     # Forkey
-    appointment_id = Column(Integer, ForeignKey('appointment.id'), unique=True)
+    appointment_id = Column(Integer, ForeignKey('appointment.id'), unique=True, nullable=False)
 
     room_number = Column(Integer, nullable=False)
     bed_number = Column(Integer, nullable=False)

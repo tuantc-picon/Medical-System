@@ -17,6 +17,11 @@ class BaseModel(Base):
     deleted_at = Column(DateTime(timezone=True), onupdate=func.now())
     deleted_by = Column(String)
 
+class BaseModelInvoice(BaseModel):
+    __abstract__ = True
+    total_amount = Column(Integer, nullable=False)
+    payment_time = Column(DateTime(timezone=True), nullable=True)
+
 
 class BaseService:
     def __init__(self, db: Optional[AsyncSession] = None):
