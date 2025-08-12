@@ -45,7 +45,7 @@ class Doctor(User):
     }
     # relationship Doctor
     appointments = relationship("Appointment", back_populates="doctor")
-    schedules = relationship("WorkSchedule", back_populates="doctor")
+    schedules = relationship("ScheduleDoctor", back_populates="doctor")
     doctor_certificates = relationship("DoctorCertificate", back_populates="doctor")
 
 
