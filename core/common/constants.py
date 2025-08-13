@@ -38,8 +38,8 @@ class DefaultRoleEnum(Enum):
         obj.role_id = id
         obj.role_name = name
         return obj
-
-    @classmethod  # help with member variables
+     
+    @classmethod
     def get_schema_by_role_id(cls, role_id):
         from app.users.schemas.admin import AdminReadSchema
         from app.users.schemas.doctor import DoctorReadSchema

@@ -21,5 +21,3 @@ class PatientUpdateSchema:
 class PatientReadSchema(PatientBaseSchema):
     created_at: datetime
     updated_at: Optional[datetime]=None
-
-

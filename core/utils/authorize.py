@@ -8,7 +8,6 @@ from core.models.role import Permission, RolePermission
 from core.utils.bearer import validate_token
 from sqlalchemy import select
 
-
 def authorize_user(permission_name: str):
     async def check_permission(
         current_user=Depends(validate_token),

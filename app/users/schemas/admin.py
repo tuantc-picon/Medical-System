@@ -2,6 +2,7 @@ from typing import Optional
 
 from datetime import datetime
 
+
 from .user import UserCreateSchema, UserBaseSchema
 
 
@@ -12,8 +13,6 @@ class AdminBaseSchema(UserBaseSchema):
 
 class AdminCreateSchema(UserCreateSchema):
     pass
-
-
 
 class AdminReadSchema(AdminBaseSchema):
     created_at: datetime
