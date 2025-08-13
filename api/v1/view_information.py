@@ -4,7 +4,7 @@ from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.users.schemas.user import UserReadSchema
 from core.common.database import get_async_db_session
-from core.services.information_user import ViewInformation
+from core.services.view_information import ViewInformationService
 from core.utils.authorize import authorize_user
 
 
@@ -12,39 +12,38 @@ view = APIRouter(prefix="", tags=["View"])
 
 
 @view.get("/users", response_model=List[UserReadSchema], status_code=status.HTTP_200_OK)
-async def view_list_users(
+async def view_users_list(
     role_id: int = Query(None),
     name: str = Query(None),
     offset: int = Query(0, ge=0),
     limit: int = Query(10, ge=0),
-    db: AsyncSession = Depends(get_async_db_session),
+    db_session: AsyncSession = Depends(get_async_db_session),
     authorize=Depends(authorize_user("information_list_user:view")),
 ):
-    service = ViewInformation(db=db)
-    return await service.get_list_user(
+    view_service = ViewInformationService(db=db_session)
+    return await view_service.get_user_list(
         offset=offset, limit=limit, name=name, role_id=role_id
     )
 
 
 @view.get("/user/{user_id}", status_code=status.HTTP_200_OK)
-async def view_user_details(
-    id: int,
-    db: AsyncSession = Depends(get_async_db_session),
+async def view_user_detail(
+    user_id: int,
+    db_session: AsyncSession = Depends(get_async_db_session),
     authorize=Depends(authorize_user("information_user:search")),
 ):
-    service = ViewInformation(db=db)
-    return await service.get_user_details(id)
+    view_service = ViewInformationService(db=db_session)
+    return await view_service.get_user_detail(user_id)
 
 
 @view.get("/me", status_code=status.HTTP_200_OK)
-async def view_user_details(
+async def view_me(
     authorize=Depends(authorize_user("me:view")),
-    db: AsyncSession = Depends(get_async_db_session),
+    db_session: AsyncSession = Depends(get_async_db_session),
 ):
-    service = ViewInformation(db=db)
+    view_service = ViewInformationService(db=db_session)
     try:
-        result = await service.get_me(authorize.id)
-        return result
+        return await view_service.get_user_detail(authorize.id)
     except Exception as e:
         print("Error in get_me:", e)
         raise

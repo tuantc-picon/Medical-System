@@ -11,8 +11,8 @@ from core.models.user import User
 
 
 
-class ViewInformation(BaseService):
-    async def get_list_user(self,
+class ViewInformationService(BaseService):
+    async def get_user_list(self,
                         offset: int,
                         limit: int,
                         name: Optional[str] = None,
@@ -29,7 +29,7 @@ class ViewInformation(BaseService):
         return [UserReadSchema.model_validate(user) for user in users]
 
 
-    async def get_user_details(
+    async def get_user_detail(
             self,
             id: int,
     ):
@@ -37,7 +37,3 @@ class ViewInformation(BaseService):
         schema_cls = ROLE_MAPPING_READ_SCHEMA.get(user.role_id)
         information_detail = schema_cls.model_validate(user)
         return information_detail
-
-
-    async def get_me(self, id: int):
-        return await self.get_user_details(id=id)
