@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter, status, HTTPException
 
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -48,5 +48,4 @@ async def view_me(
     try:
         return await view_service.get_user_detail(authorize.id)
     except Exception as e:
-        print("Error in get_me:", e)
-        raise
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))

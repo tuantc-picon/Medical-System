@@ -5,6 +5,7 @@ from sqlalchemy import Column, Integer, DateTime, func, select, and_, String
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import declarative_base
+from core.common.constants import StatusInvoiceEnum
 
 Base = declarative_base()
 
@@ -17,10 +18,14 @@ class BaseModel(Base):
     deleted_at = Column(DateTime(timezone=True), onupdate=func.now())
     deleted_by = Column(String)
 
+
 class BaseModelInvoice(BaseModel):
     __abstract__ = True
     total_amount = Column(Integer, nullable=False)
     payment_time = Column(DateTime(timezone=True), nullable=True)
+    status = Column(
+        Integer, nullable=False, default=StatusInvoiceEnum.UNFINISHED.status_id
+    )
 
 
 class BaseService:
@@ -37,13 +42,13 @@ class BaseService:
             await self.db.rollback()
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Integrity error: {str(e.orig)}"
+                detail=f"Integrity error: {str(e.orig)}",
             )
         except Exception as e:
             await self.db.rollback()
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Unexpected server error: {str(e)}"
+                detail=f"Unexpected server error: {str(e)}",
             )
 
     async def _delete(self, instance):
@@ -54,13 +59,26 @@ class BaseService:
         try:
             stmt = select(model)
             if filters:
-                stmt = stmt.where(and_(*(getattr(model, key) == value for key, value in filters.items())))
+                stmt = stmt.where(
+                    and_(
+                        *(
+                            getattr(model, key) == value
+                            for key, value in filters.items()
+                        )
+                    )
+                )
             result = await self.db.execute(stmt)
         except Exception as e:
             raise e
         return result.scalar_one_or_none()
 
-    async def fetch_all(self, model, offset: Optional[int] = None, limit: Optional[int] = 0, conditions=None):
+    async def fetch_all(
+        self,
+        model,
+        offset: Optional[int] = None,
+        limit: Optional[int] = 0,
+        conditions=None,
+    ):
         stmt = select(model)
         if conditions:
             stmt = stmt.where(*conditions)
@@ -77,7 +95,9 @@ class BaseService:
     @staticmethod
     def all_none(**filters):
         if all(value is None for value in filters.values()):
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No data")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="No data"
+            )
 
 
 class BaseTimeToDetermine:

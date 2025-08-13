@@ -12,7 +12,7 @@ class User(BaseModel):
     name = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
-    gender = Column(Enum(GenderEnum), nullable=False)
+    gender = Column(Integer, nullable=False, default= GenderEnum.OTHER.gender_id)
     age = Column(Integer)
 
     __mapper_args__ = {

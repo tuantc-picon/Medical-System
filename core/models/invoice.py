@@ -2,7 +2,6 @@ from sqlalchemy import Column, Integer, DateTime, ForeignKey, Enum
 from sqlalchemy.orm import relationship
 
 from core.common.Base import BaseModelInvoice
-from core.common.constants import StatusInvoiceEnum
 from . import Appointment
 
 
@@ -11,7 +10,6 @@ class InvoicePrescription(BaseModelInvoice):
     # Forkey
     prescription_id = Column(Integer, ForeignKey('prescription.id'), unique=True)
 
-    status = Column(Enum(StatusInvoiceEnum), nullable=False)
     # relationship
     prescription = relationship("Prescription", back_populates="invoice_prescription", uselist=False)
 

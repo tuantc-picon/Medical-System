@@ -17,6 +17,6 @@ class DoctorReadSchema(DoctorBaseSchema):
     created_at: datetime
     updated_at: Optional[datetime]=None
 
-class DoctorUpdateSchema():
+class DoctorUpdateSchema:
     specialization: Optional[str]
     graduated_at: Optional[str]

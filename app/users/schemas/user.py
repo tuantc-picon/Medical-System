@@ -1,7 +1,7 @@
 from typing import Optional
 
 
-from pydantic import EmailStr
+from pydantic import EmailStr, field_serializer
 
 from core.common.constants import GenderEnum
 from core.schemas.base import MSBaseSchema, MSTimestamp
@@ -10,9 +10,12 @@ from core.schemas.base import MSBaseSchema, MSTimestamp
 class UserBaseSchema(MSBaseSchema):
     name: str
     email: EmailStr
-    gender: GenderEnum
+    gender: int = GenderEnum.OTHER.gender_id
     role_id: int
     age: Optional[int] = None
+    @field_serializer("gender")
+    def gender_to_str(self, gender: int):
+        return GenderEnum(gender).gender_name
 
 
 class UserCreateSchema(UserBaseSchema):

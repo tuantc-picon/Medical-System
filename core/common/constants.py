@@ -11,21 +11,40 @@ class SortType(int, Enum):
 
 
 class StatusAppointmentEnum(Enum):
-    PENDING = "pending"
-    CONFIRMED = "confirmed"
-    COMPLETED = "completed"
-    CANCELLED = "cancelled"
+    PENDING = (1, "pending")
+    CONFIRMED = (2, "confirmed")
+    COMPLETED = (3, "completed")
+    CANCELLED = (4, "cancelled")
+
+    def __new__(cls, id: int, name: str):
+        obj = object.__new__(cls)
+        obj.status_id = id
+        obj.status_name = name
+        return obj
 
 
 class GenderEnum(Enum):
-    MALE = "male"
-    FEMALE = "female"
-    OTHER = "other"
+    MALE = (1, "male")
+    FEMALE = (2, "female")
+    OTHER = (3, "other")
+
+    def __new__(cls, id: int, name: str):
+        obj = object.__new__(cls)
+        obj._value_ = id
+        obj.gender_id = id
+        obj.gender_name = name
+        return obj
 
 
 class StatusInvoiceEnum(Enum):
-    UNFINISHED = "unfinished"
-    COMPLETED = "completed"
+    UNFINISHED = (1, "unfinished")
+    COMPLETED = (2, "completed")
+
+    def __new__(cls, id: int, name: str):
+        obj = object.__new__(cls)
+        obj.status_id = id
+        obj.status_name = name
+        return obj
 
 
 class DefaultRoleEnum(Enum):
@@ -38,16 +57,3 @@ class DefaultRoleEnum(Enum):
         obj.role_id = id
         obj.role_name = name
         return obj
-     
-    @classmethod
-    def get_schema_by_role_id(cls, role_id):
-        from app.users.schemas.admin import AdminReadSchema
-        from app.users.schemas.doctor import DoctorReadSchema
-        from app.users.schemas.patient import PatientReadSchema
-
-        mapping = {
-            cls.ADMIN.role_id: AdminReadSchema,
-            cls.DOCTOR.role_id: DoctorReadSchema,
-            cls.PATIENT.role_id: PatientReadSchema,
-        }
-        return mapping.get(role_id, None)

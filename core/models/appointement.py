@@ -11,7 +11,7 @@ class Appointment(BaseModel):
     patient_id = Column(Integer, ForeignKey('patient.id'))
     doctor_id = Column(Integer, ForeignKey('doctor.id'))
 
-    status = Column(Enum(StatusAppointmentEnum), nullable=False)
+    status = Column(Integer, nullable=False, default=StatusAppointmentEnum.PENDING.status_id)
     cancel_reason = Column(String)
     diagnosis = Column(String)
     medical_notes = Column(String)
