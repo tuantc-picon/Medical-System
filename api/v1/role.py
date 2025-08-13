@@ -7,7 +7,7 @@ from core.utils.authorize import authorize_user
 
 role = APIRouter(
     prefix="/roles",
-    tags=["Roles"],
+    tags=["Role"],
 )
 
 
@@ -15,7 +15,7 @@ role = APIRouter(
 async def assign_role_permission(
     data: RolePermissionCreateSchema,
     db: AsyncSession = Depends(get_async_db_session),
-    authorized_user=Depends(authorize_user("permission:create")),
+    # authorized=Depends(authorize_user("permission:create")),
 ):
     service = RoleService(db)
     return await service.assign_role_permission(data)

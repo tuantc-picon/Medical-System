@@ -18,6 +18,6 @@ class DoctorReadSchema(UserBaseSchema,DoctorBaseSchema):
     updated_at: MSTimestamp
 
 
-class DoctorUpdateSchema():
+class DoctorUpdateSchema:
     specialization: Optional[str]
     graduated_at: Optional[str]
