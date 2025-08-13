@@ -8,10 +8,10 @@ from core.services.view_information import ViewInformationService
 from core.utils.authorize import authorize_user
 
 
-view = APIRouter(prefix="", tags=["View"])
+user = APIRouter(prefix="/users", tags=["User"])
 
 
-@view.get("/users", response_model=List[UserReadSchema], status_code=status.HTTP_200_OK)
+@user.get("", response_model=List[UserReadSchema], status_code=status.HTTP_200_OK)
 async def view_users_list(
     role_id: int = Query(None),
     name: str = Query(None),
@@ -26,7 +26,7 @@ async def view_users_list(
     )
 
 
-@view.get("/user/{user_id}", status_code=status.HTTP_200_OK)
+@user.get("/{user_id}", status_code=status.HTTP_200_OK)
 async def view_user_detail(
     user_id: int,
     db_session: AsyncSession = Depends(get_async_db_session),
@@ -34,16 +34,3 @@ async def view_user_detail(
 ):
     view_service = ViewInformationService(db=db_session)
     return await view_service.get_user_detail(user_id)
-
-
-@view.get("/me", status_code=status.HTTP_200_OK)
-async def view_me(
-    authorize=Depends(authorize_user("me:view")),
-    db_session: AsyncSession = Depends(get_async_db_session),
-):
-    view_service = ViewInformationService(db=db_session)
-    try:
-        return await view_service.get_user_detail(authorize.id)
-    except Exception as e:
-        print("Error in get_me:", e)
-        raise

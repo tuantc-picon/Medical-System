@@ -7,7 +7,7 @@ from core.utils.authorize import authorize_user
 
 role = APIRouter(
     prefix="/roles",
-    tags=["Roles"],
+    tags=["Role"],
 )
 
 
