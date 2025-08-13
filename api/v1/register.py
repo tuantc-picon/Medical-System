@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.users.schemas.user import UserCreateSchema, UserResponseSchema
 from core.services.register import RegisterService
 from . import get_async_db_session
-from core.common.mapping import ROLE_MAPPING_CREATE
+from core.common.mapping import ROLE_MAPPING_REGISTER_SCHEMA
 
 register = APIRouter(prefix="/register", tags=["Register"])
 
@@ -19,11 +19,15 @@ async def register_user(
 ):
     services = RegisterService(db)
 
-    if data.role_id not in ROLE_MAPPING_CREATE:
+    if data.role_id not in ROLE_MAPPING_REGISTER_SCHEMA:
         raise HTTPException(status_code=400, detail="Invalid role")
 
-    schema_class, method_name = ROLE_MAPPING_CREATE[data.role_id]
-    user = schema_class(**data.dict())
+    schema_class, method_name = ROLE_MAPPING_REGISTER_SCHEMA[data.role_id]
+    user = schema_class.model_validate(data)
 
     service_method = getattr(services, method_name)
+    if not callable(service_method):
+        raise HTTPException(
+            status_code=500, detail=f"Service method '{method_name}' not found"
+        )
     return await service_method(user)

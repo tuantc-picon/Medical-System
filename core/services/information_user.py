@@ -6,7 +6,7 @@ from app.users.schemas.user import UserReadSchema
 from core.common.Base import BaseService
 from typing import Optional
 
-from core.common.mapping import ROLE_MAPPING_READ
+from core.common.mapping import ROLE_MAPPING_READ_SCHEMA
 from core.models.user import User
 
 
@@ -34,7 +34,7 @@ class ViewInformation(BaseService):
             id: int,
     ):
         user = await self.fetch_one(User, id=id)
-        schema_cls = ROLE_MAPPING_READ.get(user.role_id)
+        schema_cls = ROLE_MAPPING_READ_SCHEMA.get(user.role_id)
         information_detail = schema_cls.model_validate(user)
         return information_detail
 
