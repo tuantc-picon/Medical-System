@@ -1,6 +1,3 @@
-from app.users.schemas.admin import AdminCreateSchema
-from app.users.schemas.doctor import DoctorCreateSchema
-from app.users.schemas.patient import PatientCreateSchema
 from core.common.constants import DefaultRoleEnum
 from app.users.schemas.admin import AdminReadSchema
 from app.users.schemas.doctor import DoctorReadSchema
@@ -13,7 +10,7 @@ ROLE_MAPPING_READ_SCHEMA = {
 }
 
 ROLE_MAPPING_REGISTER_SCHEMA = {
-    DefaultRoleEnum.ADMIN.role_id: (AdminCreateSchema, "register_admin"),
-    DefaultRoleEnum.DOCTOR.role_id: (DoctorCreateSchema, "register_doctor"),
-    DefaultRoleEnum.PATIENT.role_id: (PatientCreateSchema, "register_patient"),
+    DefaultRoleEnum.ADMIN.role_id: "register_admin",
+    DefaultRoleEnum.DOCTOR.role_id: "register_doctor",
+    DefaultRoleEnum.PATIENT.role_id: "register_patient",
 }

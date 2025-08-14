@@ -21,13 +21,4 @@ async def register_user(
 
     if data.role_id not in ROLE_MAPPING_REGISTER_SCHEMA:
         raise HTTPException(status_code=400, detail="Invalid role")
-
-    schema_class, method_name = ROLE_MAPPING_REGISTER_SCHEMA[data.role_id]
-    user = schema_class.model_validate(data)
-
-    service_method = getattr(register_service, method_name)
-    if not callable(service_method):
-        raise HTTPException(
-            status_code=500, detail=f"Service method '{method_name}' not found"
-        )
-    return await service_method(user)
+    return await register_service.register_user_information(data)
