@@ -1,7 +1,4 @@
 from app.users.schemas.user import UserCreateSchema
-from app.users.schemas.doctor import DoctorCreateSchema
-from app.users.schemas.patient import PatientCreateSchema
-from app.users.schemas.admin import AdminCreateSchema
 from core.common.database import get_async_db_session
 from api.common import handlers
 from core import services

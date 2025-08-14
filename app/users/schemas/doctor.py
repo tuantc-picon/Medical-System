@@ -9,10 +9,6 @@ class DoctorBaseSchema(UserBaseSchema):
     graduated_at: Optional[str]= None
 
 
-
-class DoctorCreateSchema(UserCreateSchema):
-    pass
-
 class DoctorReadSchema(DoctorBaseSchema):
     created_at: datetime
     updated_at: Optional[datetime]=None

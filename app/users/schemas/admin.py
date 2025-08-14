@@ -11,9 +11,6 @@ class AdminBaseSchema(UserBaseSchema):
     address: Optional[str]=None
 
 
-class AdminCreateSchema(UserCreateSchema):
-    pass
-
 class AdminReadSchema(AdminBaseSchema):
     created_at: datetime
     updated_at: Optional[datetime]=None
