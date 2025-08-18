@@ -1,10 +1,10 @@
 from typing import Optional
-
+from datetime import datetime
 
 from pydantic import EmailStr, field_serializer
 
 from core.common.constants import GenderEnum
-from core.schemas.base import MSBaseSchema, MSTimestamp
+from core.schemas.base import MSBaseSchema, MSPaginationBaseSchema
 
 
 class UserBaseSchema(MSBaseSchema):
@@ -27,8 +27,8 @@ class UserResponseSchema(UserBaseSchema):
     extra_fields: dict
 
 class UserReadSchema(UserBaseSchema):
-    created_at: MSTimestamp
-    updated_at: MSTimestamp
+    created_at: datetime
+    updated_at: Optional[datetime]=None
 
 
 class UserUpdateSchema(MSBaseSchema):
@@ -42,3 +42,8 @@ class UserUpdateSchema(MSBaseSchema):
 class UserLoginSchema(MSBaseSchema):
     email: EmailStr
     password: str
+
+
+class UserListQuerySchema(MSPaginationBaseSchema):
+    role_id: Optional[int] = None
+    name: Optional[str] = None

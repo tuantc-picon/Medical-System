@@ -11,7 +11,7 @@ from sqlalchemy import select
 
 def authorize_user(permission_name: str):
     async def check_permission(
-        current_user=Depends(validate_token),
+        access_token_data=Depends(validate_token),
         db: AsyncSession = Depends(get_async_db_session),
     ):
         try:
@@ -20,7 +20,7 @@ def authorize_user(permission_name: str):
                 select(RolePermission)
                 .join(Permission, Permission.id == RolePermission.permission_id)
                 .where(
-                    RolePermission.role_id == current_user.role_id,
+                    RolePermission.role_id == access_token_data.role_id,
                     Permission.name == permission_name,
                 )
             )
@@ -32,7 +32,7 @@ def authorize_user(permission_name: str):
                     status_code=status.HTTP_403_FORBIDDEN,
                     detail="do not have permission to perform this action",
                 )
-            return current_user
+            return access_token_data
         except SQLAlchemyError as e:
             raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail=str(e))
         except Exception as e:

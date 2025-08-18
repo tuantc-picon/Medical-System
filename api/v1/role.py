@@ -15,7 +15,7 @@ role = APIRouter(
 async def assign_role_permission(
     data: RolePermissionCreateSchema,
     db: AsyncSession = Depends(get_async_db_session),
-    # authorized=Depends(authorize_user("permission:create")),
+    authorized_user=Depends(authorize_user("permission:create")),
 ):
-    service = RoleService(db)
-    return await service.assign_role_permission(data)
+    user_service = RoleService(db)
+    return await user_service.assign_role_permission(data)

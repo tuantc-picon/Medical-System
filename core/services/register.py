@@ -35,12 +35,12 @@ class RegisterService(BaseService):
 
     async def register_user_information(self, user_data: UserCreateSchema):
         extra = {
-            "phone_number": user_data.extra_fields.get("phone_number", None),
-            "address": user_data.extra_fields.get("address", None),
-            "specialization": user_data.extra_fields.get("specialization", None),
-            "graduated_at": user_data.extra_fields.get("graduated_at", None),
-            "job": user_data.extra_fields.get("job", None),
-            "insurance_number": user_data.extra_fields.get("insurance_number", None),
+            "phone_number": user_data.extra_fields.get("phone_number"),
+            "address": user_data.extra_fields.get("address"),
+            "specialization": user_data.extra_fields.get("specialization"),
+            "graduated_at": user_data.extra_fields.get("graduated_at"),
+            "job": user_data.extra_fields.get("job"),
+            "insurance_number": user_data.extra_fields.get("insurance_number"),
         }
         if user_data.role_id == DefaultRoleEnum.ADMIN.role_id:
             model = Admin

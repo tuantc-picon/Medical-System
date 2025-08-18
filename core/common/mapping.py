@@ -8,9 +8,3 @@ ROLE_MAPPING_READ_SCHEMA = {
     DefaultRoleEnum.DOCTOR.role_id: DoctorReadSchema,
     DefaultRoleEnum.PATIENT.role_id: PatientReadSchema,
 }
-
-ROLE_MAPPING_REGISTER_SCHEMA = {
-    DefaultRoleEnum.ADMIN.role_id: "register_admin",
-    DefaultRoleEnum.DOCTOR.role_id: "register_doctor",
-    DefaultRoleEnum.PATIENT.role_id: "register_patient",
-}
