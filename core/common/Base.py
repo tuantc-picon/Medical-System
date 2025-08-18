@@ -5,6 +5,7 @@ from sqlalchemy import Column, Integer, DateTime, func, select, and_, String
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import declarative_base
+from core.schemas.base import MSPaginationBaseSchema
 from core.common.constants import StatusInvoiceEnum
 
 Base = declarative_base()
@@ -72,34 +73,21 @@ class BaseService:
             raise e
         return result.scalar_one_or_none()
 
-    async def fetch_all(
+    async def fetch_pagination(
         self,
         model,
-        offset: Optional[int] = None,
-        limit: Optional[int] = 0,
-        conditions=None,
+        pagination_data=MSPaginationBaseSchema,
     ):
+        if pagination_data.no_pagination:
+            return None
         stmt = select(model)
-        if conditions:
-            stmt = stmt.where(*conditions)
-        if offset is not None:
+        if pagination_data.limit is not None:
+            stmt = stmt.limit(pagination_data.limit)
+        if pagination_data.page is not None and pagination_data.limit is not None:
+            offset = (pagination_data.page - 1) * pagination_data.limit
             stmt = stmt.offset(offset)
-        if limit is not None:
-            stmt = stmt.limit(limit)
         try:
             result = await self.db.execute(stmt)
             return result.scalars().all()
         except Exception as e:
             raise e
-
-    @staticmethod
-    def all_none(**filters):
-        if all(value is None for value in filters.values()):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="No data"
-            )
-
-
-class BaseTimeToDetermine:
-    start_time = Column(DateTime(timezone=True), nullable=False)
-    end_time = Column(DateTime(timezone=True))

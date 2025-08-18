@@ -6,7 +6,7 @@ from .register import register as router_register
 from .authentication import authentication as router_authentication
 from .schedule import schedule as router_schedule
 from .role import role as router_role
-from .user import user as router_user
+from .user import user_router as router_user
 
 from fastapi import APIRouter
 
