@@ -18,5 +18,5 @@ async def create_schedule_doctor(
     authorized_user=Depends(authorize_user("schedule_doctor:create")),
     db: AsyncSession = Depends(get_async_db_session),
 ):
-    schedule_service = ScheduleService(db)
-    return await schedule_service.create_doctor_schedule(schedule_doctor)
+    service = ScheduleService(db)
+    return await service.create_doctor_schedule(schedule_doctor)
