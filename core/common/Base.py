@@ -75,17 +75,16 @@ class BaseService:
 
     async def fetch_pagination(
         self,
-        model,
+        stmt,
         pagination_data=MSPaginationBaseSchema,
     ):
         if pagination_data.no_pagination:
-            return None
-        stmt = select(model)
-        if pagination_data.limit is not None:
-            stmt = stmt.limit(pagination_data.limit)
-        if pagination_data.page is not None and pagination_data.limit is not None:
-            offset = (pagination_data.page - 1) * pagination_data.limit
-            stmt = stmt.offset(offset)
+            result = await self.db.execute(stmt)
+            return result.scalars().all()
+
+        stmt = stmt.limit(pagination_data.limit)
+        offset = (pagination_data.page - 1) * pagination_data.limit
+        stmt = stmt.offset(offset)
         try:
             result = await self.db.execute(stmt)
             return result.scalars().all()
