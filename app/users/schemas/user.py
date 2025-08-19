@@ -30,6 +30,10 @@ class UserReadSchema(UserBaseSchema):
     created_at: datetime
     updated_at: Optional[datetime]=None
 
+class ListUsersSchema(MSBaseSchema):
+    list_users: list[UserReadSchema]
+    total: int
+
 
 class UserUpdateSchema(MSBaseSchema):
     name: Optional[str] = None

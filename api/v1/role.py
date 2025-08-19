@@ -17,5 +17,5 @@ async def assign_role_permission(
     db: AsyncSession = Depends(get_async_db_session),
     authorized_user=Depends(authorize_user("permission:create")),
 ):
-    user_service = RoleService(db)
-    return await user_service.assign_role_permission(data)
+    role_service = RoleService(db)
+    return await role_service.assign_role_permission(data)
