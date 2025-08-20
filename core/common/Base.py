@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import declarative_base
 from core.schemas.base import MSPaginationBaseSchema
 from core.common.constants import StatusInvoiceEnum
+from math import ceil
 
 Base = declarative_base()
 
@@ -74,19 +75,39 @@ class BaseService:
         return result.scalar_one_or_none()
 
     async def fetch_pagination(
-        self,
-        stmt,
-        pagination_data=MSPaginationBaseSchema,
+        self, stmt, base_url, schema_response, pagination_data: MSPaginationBaseSchema
     ):
-        if pagination_data.no_pagination:
-            result = await self.db.execute(stmt)
-            return result.scalars().all()
+        total_stmt = await self.db.execute(
+            select(func.count()).select_from(stmt.subquery())
+        )
+        total = total_stmt.scalar_one()
+        pages = ceil(total / pagination_data.limit) if total else 1
 
-        stmt = stmt.limit(pagination_data.limit)
-        offset = (pagination_data.page - 1) * pagination_data.limit
-        stmt = stmt.offset(offset)
-        try:
-            result = await self.db.execute(stmt)
-            return result.scalars().all()
-        except Exception as e:
-            raise e
+        if pagination_data.no_pagination:
+            item = await self.db.execute(stmt)
+            prev = None
+            next = None
+        else:
+            stmt = stmt.limit(pagination_data.limit).offset(
+                (pagination_data.page - 1) * pagination_data.limit
+            )
+            prev = (
+                base_url
+                + f"?page={pagination_data.page-1}&limit={pagination_data.limit}&no_pagination=false"
+            )
+            next = (
+                base_url
+                + f"?page={pagination_data.page+1}&limit={pagination_data.limit}&no_pagination=false"
+            )
+            item = await self.db.execute(stmt)
+
+        result = item.scalars().all()
+        return schema_response(
+            result=result,
+            total=total,
+            pages=pages,
+            page=pagination_data.page,
+            limit=pagination_data.limit,
+            prev=prev,
+            next=next,
+        )

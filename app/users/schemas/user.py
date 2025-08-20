@@ -5,7 +5,7 @@ from pydantic import EmailStr, field_serializer
 
 from core.common.constants import GenderEnum
 from core.schemas.base import MSBaseSchema, MSPaginationBaseSchema
-
+from app.common.list_schemas import ListBaseSchema
 
 class UserBaseSchema(MSBaseSchema):
     name: str
@@ -30,10 +30,8 @@ class UserReadSchema(UserBaseSchema):
     created_at: datetime
     updated_at: Optional[datetime]=None
 
-class ListUsersSchema(MSBaseSchema):
-    list_users: list[UserReadSchema]
-    total: int
-
+class UserListReadSchema(ListBaseSchema):
+    result: list[UserReadSchema]
 
 class UserUpdateSchema(MSBaseSchema):
     name: Optional[str] = None
