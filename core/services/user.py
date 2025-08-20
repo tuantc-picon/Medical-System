@@ -1,19 +1,23 @@
+from pydantic import HttpUrl
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy import select
+
+from sqlalchemy import select, and_
 from fastapi import HTTPException, status
 
-
-from app.users.schemas.user import UserReadSchema
+from app.users.schemas.user import UserListReadSchema
 from core.common.Base import BaseService, MSPaginationBaseSchema
 
 from core.common.mapping import ROLE_MAPPING_READ_SCHEMA
 from core.models.user import User
-from app.users.schemas.user import UserListQuerySchema, ListUsersSchema
+from app.users.schemas.user import UserListQuerySchema
+
+
+
 
 
 
 class UserService(BaseService):
-    async def get_user_list(self, user_information: UserListQuerySchema):
+    async def get_user_list(self, user_information: UserListQuerySchema, base_url: HttpUrl):
         try:
             conditions = []
             if user_information.name:
@@ -23,18 +27,15 @@ class UserService(BaseService):
 
             stmt = select(User)
             if conditions:
-                stmt = stmt.where(*conditions)
+                stmt = stmt.where(and_(*conditions))
+
             pagination_data = MSPaginationBaseSchema(page=user_information.page,
                                                      limit=user_information.limit,
                                                      no_pagination=user_information.no_pagination)
-            users = await self.fetch_pagination(stmt, pagination_data)
+            users = await self.fetch_pagination(stmt,base_url, UserListReadSchema,  pagination_data)
+            return users
         except SQLAlchemyError as e:
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
-        list_users_respone = ListUsersSchema(
-            list_users=[UserReadSchema.model_validate(user) for user in users],
-            total=len(users)
-        )
-        return list_users_respone
 
     async def get_user_detail(
             self,
