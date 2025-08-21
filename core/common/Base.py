@@ -8,6 +8,8 @@ from sqlalchemy.orm import declarative_base
 from core.schemas.base import MSPaginationBaseSchema
 from core.common.constants import StatusInvoiceEnum
 from math import ceil
+from app.common.list_schemas import ListBaseSchema
+from app.users.schemas.user import UserReadSchema
 
 Base = declarative_base()
 
@@ -75,39 +77,44 @@ class BaseService:
         return result.scalar_one_or_none()
 
     async def fetch_pagination(
-        self, stmt, base_url, schema_response, pagination_data: MSPaginationBaseSchema
+        self,
+        stmt,
+        pagination_data: MSPaginationBaseSchema,
+        current_url,
+        total_user,
+        schema_response,
     ):
-        total_stmt = await self.db.execute(
-            select(func.count()).select_from(stmt.subquery())
-        )
-        total = total_stmt.scalar_one()
-        pages = ceil(total / pagination_data.limit) if total else 1
+        pages = ceil(total_user / pagination_data.limit_page) if total_user else 1
+
+        prev = None
+        next = None
 
         if pagination_data.no_pagination:
-            item = await self.db.execute(stmt)
-            prev = None
-            next = None
-        else:
-            stmt = stmt.limit(pagination_data.limit).offset(
-                (pagination_data.page - 1) * pagination_data.limit
-            )
-            prev = (
-                base_url
-                + f"?page={pagination_data.page-1}&limit={pagination_data.limit}&no_pagination=false"
-            )
-            next = (
-                base_url
-                + f"?page={pagination_data.page+1}&limit={pagination_data.limit}&no_pagination=false"
-            )
-            item = await self.db.execute(stmt)
+            pagination_data.page = 1
+            pagination_data.limit_page = total_user
 
+        elif pagination_data.page <= pages:
+            cal_offset = (pagination_data.page - 1) * pagination_data.limit_page
+            stmt = stmt.offset(cal_offset)
+            stmt = stmt.limit(pagination_data.limit_page)
+            if pagination_data.page > 1:
+                prev = f"{current_url}?page={pagination_data.page-1}&limit={pagination_data.limit_page}&no_pagination=false"
+            if pagination_data.page < pages:
+                next = f"{current_url}?page={pagination_data.page+1}&limit={pagination_data.limit_page}&no_pagination=false"
+
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Page not found"
+            )
+
+        item = await self.db.execute(stmt)
         result = item.scalars().all()
-        return schema_response(
+        return ListBaseSchema[schema_response](
             result=result,
-            total=total,
+            total=total_user,
             pages=pages,
             page=pagination_data.page,
-            limit=pagination_data.limit,
+            limit=pagination_data.limit_page,
             prev=prev,
             next=next,
         )

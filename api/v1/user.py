@@ -17,10 +17,8 @@ async def get_users_list(
     db_session: AsyncSession = Depends(get_async_db_session),
     authorized_user=Depends(authorize_user("user:view-list")),
 ):
-    base_url = str(request.url).split("?")[0]
-
     user_service = UserService(db=db_session)
-    return await user_service.get_user_list(query_schema, base_url)
+    return await user_service.get_user_list(query_schema, request)
 
 
 @user_router.get("/{user_id}", status_code=status.HTTP_200_OK)
