@@ -19,29 +19,15 @@ class UserService(BaseService):
                 conditions.append(User.name.ilike(f"%{user_information.name}%"))
             if user_information.role_id:
                 conditions.append(User.role_id == user_information.role_id)
-
-            stmt_users = select(User)
-            stmt_count = select(func.count()).select_from(User)
-
-            if conditions:
-                stmt_users = stmt_users.where(and_(*conditions))
-                stmt_count = stmt_count.where(and_(*conditions))
-            result_count = await self.db.execute(stmt_count)
-            total_users = result_count.scalar_one()
-
-            pagination = MSPaginationBaseSchema(
-                page=user_information.page,
-                limit_page=user_information.limit_page,
-                no_pagination=user_information.no_pagination,
-            )
+            user_dict = user_information.model_dump() # use model_dump() instead of dict()
 
             base_url = str(request.url).split("?")[0]
+            user_dict["base_url"] = base_url
 
             result = await self.fetch_pagination(
-                stmt_users,
-                pagination,
-                base_url,
-                total_users,
+                User,
+                conditions,
+                user_dict,
                 UserBaseResponseSchema,
             )
             return result

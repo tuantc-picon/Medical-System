@@ -9,7 +9,7 @@ from core.schemas.base import MSPaginationBaseSchema
 from core.common.constants import StatusInvoiceEnum
 from math import ceil
 from app.common.list_schemas import ListBaseSchema
-from app.users.schemas.user import UserReadSchema
+from core.utils.url import build_url
 
 Base = declarative_base()
 
@@ -78,29 +78,45 @@ class BaseService:
 
     async def fetch_pagination(
         self,
-        stmt,
-        pagination_data: MSPaginationBaseSchema,
-        current_url,
-        total_user,
+        model,
+        conditions,
+        user_dict,
         schema_response,
     ):
-        pages = ceil(total_user / pagination_data.limit_page) if total_user else 1
-
         prev = None
         next = None
+        limit = user_dict["limit"]
+        page = user_dict["page"]
+        name = user_dict["name"]
+        role_id = user_dict["role_id"]
+        current_url = user_dict["base_url"]
+        no_pagination = user_dict["no_pagination"]
 
-        if pagination_data.no_pagination:
-            pagination_data.page = 1
-            pagination_data.limit_page = total_user
+        total_stm = select(func.count()).select_from(model).where(*conditions)
+        total_user = await self.db.scalar(total_stm)
 
-        elif pagination_data.page <= pages:
-            cal_offset = (pagination_data.page - 1) * pagination_data.limit_page
+        pages = ceil(total_user / limit) if total_user else 1
+        stmt = select(model).where(*conditions)
+        if no_pagination:
+            page = 1
+
+        elif page <= pages:
+            cal_offset = (page - 1) * limit
             stmt = stmt.offset(cal_offset)
-            stmt = stmt.limit(pagination_data.limit_page)
-            if pagination_data.page > 1:
-                prev = f"{current_url}?page={pagination_data.page-1}&limit={pagination_data.limit_page}&no_pagination=false"
-            if pagination_data.page < pages:
-                next = f"{current_url}?page={pagination_data.page+1}&limit={pagination_data.limit_page}&no_pagination=false"
+            stmt = stmt.limit(limit)
+            parameter_dict = {
+                "page": page,
+                "limit": limit,
+                "no_pagination": no_pagination,
+                "role_id": role_id,
+                "name": name,
+            }
+            if page > 1:
+                parameter_dict["page"] = page - 1
+                prev = build_url(current_url, parameter_dict)
+            if page < pages:
+                parameter_dict["page"] = page + 1
+                next = build_url(current_url, parameter_dict)
 
         else:
             raise HTTPException(
@@ -109,12 +125,13 @@ class BaseService:
 
         item = await self.db.execute(stmt)
         result = item.scalars().all()
-        return ListBaseSchema[schema_response](
+        result = [schema_response.from_orm(obj) for obj in result]
+        return ListBaseSchema(
             result=result,
             total=total_user,
             pages=pages,
-            page=pagination_data.page,
-            limit=pagination_data.limit_page,
+            page=page,
+            limit=limit,
             prev=prev,
             next=next,
         )
