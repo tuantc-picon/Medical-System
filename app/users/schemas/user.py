@@ -22,16 +22,17 @@ class UserCreateSchema(UserBaseSchema):
     password: str
     extra_fields: dict
 
-class UserResponseSchema(UserBaseSchema):
+
+class UserBaseResponseSchema(UserBaseSchema):
     id: int
+
+
+class UserResponseSchema(UserBaseResponseSchema):
     extra_fields: dict
 
 class UserReadSchema(UserBaseSchema):
     created_at: datetime
     updated_at: Optional[datetime]=None
-
-class UserListReadSchema(ListBaseSchema):
-    result: list[UserReadSchema]
 
 class UserUpdateSchema(MSBaseSchema):
     name: Optional[str] = None

@@ -17,7 +17,7 @@ from core.common.constants import SortType
 
 class MSPaginationBaseSchema(BaseModel):
     page: Annotated[int, Query(ge=1)] = 1
-    limit: Annotated[int, Query(ge=1, le=1000)] = 20
+    limit_page: Annotated[int, Query(ge=1, le=1000)] = 20
     no_pagination: Optional[Annotated[bool, Query()]] = False
 
 
