@@ -4,8 +4,7 @@ from datetime import datetime
 from pydantic import EmailStr, field_serializer
 
 from core.common.constants import GenderEnum
-from core.schemas.base import MSBaseSchema, MSPaginationBaseSchema
-from app.common.list_schemas import ListBaseSchema
+from core.schemas.base import MSBaseSchema, MSSortPaginationBaseSchema
 
 class UserBaseSchema(MSBaseSchema):
     name: str
@@ -47,6 +46,6 @@ class UserLoginSchema(MSBaseSchema):
     password: str
 
 
-class UserListQuerySchema(MSPaginationBaseSchema):
+class UserListQuerySchema(MSSortPaginationBaseSchema):
     role_id: Optional[int] = None
     name: Optional[str] = None

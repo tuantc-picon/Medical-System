@@ -3,11 +3,12 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import select, and_, func
 from fastapi import HTTPException, status
 
-from core.common.Base import BaseService, MSPaginationBaseSchema
+from core.common.Base import BaseService
 
 from core.common.mapping import ROLE_MAPPING_READ_SCHEMA
 from core.models.user import User
 from app.users.schemas.user import UserListQuerySchema, UserBaseResponseSchema
+from core.schemas.base import MSSortPaginationBaseSchema
 
 
 class UserService(BaseService):
@@ -19,15 +20,11 @@ class UserService(BaseService):
             if user_information.role_id:
                 conditions.append(User.role_id == user_information.role_id)
 
-            stmt = select(User)
-            if conditions:
-                stmt = stmt.where(and_(*conditions))
-
             stmt = select(User, func.count(User.id).over().label('total'))
             if conditions:
                 stmt = stmt.where(and_(*conditions))
             
-            pagination_data = MSPaginationBaseSchema(page=user_information.page,
+            pagination_data =MSSortPaginationBaseSchema(page=user_information.page,
                                                      limit=user_information.limit,
                                                      no_pagination=user_information.no_pagination)
             result = await self.fetch_pagination(

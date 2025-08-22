@@ -1,12 +1,12 @@
 from typing import Optional
 
+from exceptiongroup import ExceptionGroup
 from fastapi import HTTPException, status
-from sqlalchemy import Column, Integer, DateTime, func, select, and_, String
+from sqlalchemy import Column, Integer, DateTime, func, select, and_, String, desc, asc
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import declarative_base
-from core.schemas.base import MSPaginationBaseSchema
-from core.common.constants import StatusInvoiceEnum
+from core.common.constants import StatusInvoiceEnum, SortType
 from math import ceil
 from app.common.list_schemas import ListBaseSchema
 from core.utils.url import update_page_in_url
@@ -82,37 +82,56 @@ class BaseService:
         request,
         schema_response,
         pagination_data,
+        sort_by: str = None,
+        sort_type: SortType = SortType.DESC,
     ):
+        try:
+            limit = pagination_data.limit
+            page = pagination_data.page
+            no_pagination = pagination_data.no_pagination
 
-        limit = pagination_data.limit
-        page = pagination_data.page
-        no_pagination = pagination_data.no_pagination
+            if not no_pagination:
+                stmt = stmt.offset((page - 1) * limit).limit(limit)
 
-        if not no_pagination:
-            stmt = stmt.offset((page - 1) * limit).limit(limit)
+            stmt = await BaseService.sort_pagination(stmt, sort_by, sort_type)
 
-        item = await self.db.execute(stmt)
-        rows = item.fetchall()
+            item = await self.db.execute(stmt)
+            rows = item.fetchall()
 
-        total = rows[0].total if rows and hasattr(rows[0], "total") else 0
-        result = [schema_response.model_validate(row[0]) for row in rows]
+            total = rows[0].total if rows and hasattr(rows[0], "total") else 0
+            result = [schema_response.model_validate(row[0]) for row in rows]
 
-        pages = ceil(total / limit) if total > 0 else 1
+            pages = ceil(total / limit) if total > 0 else 1
 
-        url = str(request.url) if not no_pagination and page <= pages else None
-        prev = None
-        next = None
-        if not no_pagination and url and page <= pages:
-            if page > 1:
-                prev = update_page_in_url(url, page - 1)
-            if page < pages:
-                next = update_page_in_url(url, page + 1)
-        return ListBaseSchema(
-            result=result,
-            total=total,
-            pages=pages,
-            page=page,
-            limit=limit,
-            prev=prev,
-            next=next,
-        )
+            url = str(request.url) if not no_pagination and page <= pages else None
+            prev = None
+            next = None
+            if not no_pagination and url and page <= pages:
+                if page > 1:
+                    prev = update_page_in_url(url, page - 1)
+                if page < pages:
+                    next = update_page_in_url(url, page + 1)
+
+            return ListBaseSchema(
+                result=result,
+                total=total,
+                pages=pages,
+                page=page,
+                limit=limit,
+                prev=prev,
+                next=next,
+            )
+        except ExceptionGroup as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
+            )
+
+    @staticmethod
+    async def sort_pagination(stmt, sort_by: str, sort_type: SortType):
+        order_stmt = desc("id")
+        if sort_by and sort_type != SortType.NONE:
+            if sort_type == SortType.DESC:
+                order_stmt = desc(sort_by)
+            else:
+                order_stmt = asc(sort_by)
+        return stmt.order_by(order_stmt)
