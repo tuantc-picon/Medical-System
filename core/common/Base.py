@@ -9,7 +9,7 @@ from core.schemas.base import MSPaginationBaseSchema
 from core.common.constants import StatusInvoiceEnum
 from math import ceil
 from app.common.list_schemas import ListBaseSchema
-from core.utils.url import build_url
+from core.utils.url import update_page_in_url
 
 Base = declarative_base()
 
@@ -79,47 +79,34 @@ class BaseService:
     async def fetch_pagination(
         self,
         stmt,
-        data,
+        request,
         schema_response,
+        pagination_data,
     ):
-        prev = None
-        next = None
-        limit = data["limit"]
-        page = data["page"]
-        name = data["name"]
-        current_url = data["base_url"]
-        no_pagination = data["no_pagination"]
 
-        tmp_result = await self.db.execute(stmt)
-        tmp_row = tmp_result.all()
-        total = len(tmp_row)
-        pages = ceil(total / limit) if total else 1
-        if no_pagination:
-            page = 1
+        limit = pagination_data.limit
+        page = pagination_data.page
+        no_pagination = pagination_data.no_pagination
 
-        elif page <= pages:
-            cal_offset = (page - 1) * limit
-            stmt = stmt.limit(limit).offset(cal_offset)
-            parameter_dict = {
-                "page": page,
-                "limit": limit,
-                "no_pagination": no_pagination,
-            }
-            if page > 1:
-                parameter_dict["page"] = page - 1
-                prev = build_url(current_url, parameter_dict)
-            if page < pages:
-                parameter_dict["page"] = page + 1
-                next = build_url(current_url, parameter_dict)
-
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Page not found"
-            )
+        if not no_pagination:
+            stmt = stmt.offset((page - 1) * limit).limit(limit)
 
         item = await self.db.execute(stmt)
-        result = item.scalars().all()
-        result = [schema_response.from_orm(obj) for obj in result]
+        rows = item.fetchall()
+
+        total = rows[0].total if rows and hasattr(rows[0], "total") else 0
+        result = [schema_response.model_validate(row[0]) for row in rows]
+
+        pages = ceil(total / limit) if total > 0 else 1
+
+        url = str(request.url) if not no_pagination and page <= pages else None
+        prev = None
+        next = None
+        if not no_pagination and url and page <= pages:
+            if page > 1:
+                prev = update_page_in_url(url, page - 1)
+            if page < pages:
+                next = update_page_in_url(url, page + 1)
         return ListBaseSchema(
             result=result,
             total=total,

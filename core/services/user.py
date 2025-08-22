@@ -1,4 +1,3 @@
-from fastapi import Request
 from sqlalchemy.exc import SQLAlchemyError
 
 from sqlalchemy import select, and_, func
@@ -19,18 +18,23 @@ class UserService(BaseService):
                 conditions.append(User.name.ilike(f"%{user_information.name}%"))
             if user_information.role_id:
                 conditions.append(User.role_id == user_information.role_id)
-            data = user_information.model_dump() # use model_dump() instead of dict()
 
-            stmt = select(User,func.count().label("total")).group_by(User.id)
-            stmt = stmt.where(*conditions)
+            stmt = select(User)
+            if conditions:
+                stmt = stmt.where(and_(*conditions))
 
-            base_url = str(request.url).split("?")[0]
-            data["base_url"] = base_url
-
+            stmt = select(User, func.count(User.id).over().label('total'))
+            if conditions:
+                stmt = stmt.where(and_(*conditions))
+            
+            pagination_data = MSPaginationBaseSchema(page=user_information.page,
+                                                     limit=user_information.limit,
+                                                     no_pagination=user_information.no_pagination)
             result = await self.fetch_pagination(
                 stmt,
-                data,
+                request,
                 UserBaseResponseSchema,
+                pagination_data,
             )
             return result
 
