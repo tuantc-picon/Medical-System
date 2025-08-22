@@ -9,7 +9,7 @@ from core.schemas.base import MSPaginationBaseSchema
 from core.common.constants import StatusInvoiceEnum
 from math import ceil
 from app.common.list_schemas import ListBaseSchema
-from core.utils.url import build_url
+from core.utils.url import update_page_in_url
 
 Base = declarative_base()
 
@@ -78,57 +78,38 @@ class BaseService:
 
     async def fetch_pagination(
         self,
-        model,
-        conditions,
-        user_dict,
+        stmt,
+        request,
         schema_response,
+        pagination_data,
     ):
+
+        limit = pagination_data.limit
+        page = pagination_data.page
+        no_pagination = pagination_data.no_pagination
+
+        if not no_pagination:
+            stmt = stmt.offset((page - 1) * limit).limit(limit)
+        
+        item = await self.db.execute(stmt)
+        rows = item.fetchall()
+        
+        total = rows[0].total if rows and hasattr(rows[0], 'total') else 0
+        result = [schema_response.model_validate(row[0]) for row in rows]
+
+        pages = ceil(total / limit) if total > 0 else 1
+
+        url = str(request.url) if not no_pagination and page <= pages else None
         prev = None
         next = None
-        limit = user_dict["limit"]
-        page = user_dict["page"]
-        name = user_dict["name"]
-        role_id = user_dict["role_id"]
-        current_url = user_dict["base_url"]
-        no_pagination = user_dict["no_pagination"]
-
-        total_stm = select(func.count()).select_from(model).where(*conditions)
-        total_user = await self.db.scalar(total_stm)
-
-        pages = ceil(total_user / limit) if total_user else 1
-        stmt = select(model).where(*conditions)
-        if no_pagination:
-            page = 1
-
-        elif page <= pages:
-            cal_offset = (page - 1) * limit
-            stmt = stmt.offset(cal_offset)
-            stmt = stmt.limit(limit)
-            parameter_dict = {
-                "page": page,
-                "limit": limit,
-                "no_pagination": no_pagination,
-                "role_id": role_id,
-                "name": name,
-            }
+        if not no_pagination and url and page <= pages:
             if page > 1:
-                parameter_dict["page"] = page - 1
-                prev = build_url(current_url, parameter_dict)
+                prev = update_page_in_url(url, page - 1)
             if page < pages:
-                parameter_dict["page"] = page + 1
-                next = build_url(current_url, parameter_dict)
-
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Page not found"
-            )
-
-        item = await self.db.execute(stmt)
-        result = item.scalars().all()
-        result = [schema_response.from_orm(obj) for obj in result]
+                next = update_page_in_url(url, page + 1)
         return ListBaseSchema(
             result=result,
-            total=total_user,
+            total=total,
             pages=pages,
             page=page,
             limit=limit,
