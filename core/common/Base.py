@@ -78,38 +78,32 @@ class BaseService:
 
     async def fetch_pagination(
         self,
-        model,
-        conditions,
-        user_dict,
+        stmt,
+        data,
         schema_response,
     ):
         prev = None
         next = None
-        limit = user_dict["limit"]
-        page = user_dict["page"]
-        name = user_dict["name"]
-        role_id = user_dict["role_id"]
-        current_url = user_dict["base_url"]
-        no_pagination = user_dict["no_pagination"]
+        limit = data["limit"]
+        page = data["page"]
+        name = data["name"]
+        current_url = data["base_url"]
+        no_pagination = data["no_pagination"]
 
-        total_stm = select(func.count()).select_from(model).where(*conditions)
-        total_user = await self.db.scalar(total_stm)
-
-        pages = ceil(total_user / limit) if total_user else 1
-        stmt = select(model).where(*conditions)
+        tmp_result = await self.db.execute(stmt)
+        tmp_row = tmp_result.all()
+        total = len(tmp_row)
+        pages = ceil(total / limit) if total else 1
         if no_pagination:
             page = 1
 
         elif page <= pages:
             cal_offset = (page - 1) * limit
-            stmt = stmt.offset(cal_offset)
-            stmt = stmt.limit(limit)
+            stmt = stmt.limit(limit).offset(cal_offset)
             parameter_dict = {
                 "page": page,
                 "limit": limit,
                 "no_pagination": no_pagination,
-                "role_id": role_id,
-                "name": name,
             }
             if page > 1:
                 parameter_dict["page"] = page - 1
@@ -128,7 +122,7 @@ class BaseService:
         result = [schema_response.from_orm(obj) for obj in result]
         return ListBaseSchema(
             result=result,
-            total=total_user,
+            total=total,
             pages=pages,
             page=page,
             limit=limit,

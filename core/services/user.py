@@ -19,15 +19,17 @@ class UserService(BaseService):
                 conditions.append(User.name.ilike(f"%{user_information.name}%"))
             if user_information.role_id:
                 conditions.append(User.role_id == user_information.role_id)
-            user_dict = user_information.model_dump() # use model_dump() instead of dict()
+            data = user_information.model_dump() # use model_dump() instead of dict()
+
+            stmt = select(User,func.count().label("total")).group_by(User.id)
+            stmt = stmt.where(*conditions)
 
             base_url = str(request.url).split("?")[0]
-            user_dict["base_url"] = base_url
+            data["base_url"] = base_url
 
             result = await self.fetch_pagination(
-                User,
-                conditions,
-                user_dict,
+                stmt,
+                data,
                 UserBaseResponseSchema,
             )
             return result
