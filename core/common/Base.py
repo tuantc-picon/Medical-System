@@ -90,11 +90,11 @@ class BaseService:
 
             if not no_pagination:
                 stmt = stmt.offset((page - 1) * limit).limit(limit)
-            
+
             item = await self.db.execute(stmt)
             rows = item.fetchall()
-            
-            total = rows[0].total if rows and hasattr(rows[0], 'total') else 0
+
+            total = rows[0].total if rows and hasattr(rows[0], "total") else 0
             result = [schema_response.model_validate(row[0]) for row in rows]
 
             pages = ceil(total / limit) if total > 0 else 1
@@ -102,7 +102,7 @@ class BaseService:
             url = str(request.url) if not no_pagination and page <= pages else None
             prev = None
             next = None
-            if not no_pagination and url and page <= pages:
+            if url:
                 if page > 1:
                     prev = update_page_in_url(url, page - 1)
                 if page < pages:
@@ -114,7 +114,9 @@ class BaseService:
                 page=page,
                 limit=limit,
                 prev=prev,
-                    next=next,
-                )
+                next=next,
+            )
         except Exception as e:
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
+            )
