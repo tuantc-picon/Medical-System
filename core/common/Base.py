@@ -106,7 +106,7 @@ class BaseService:
             url = str(request.url) if not no_pagination and page <= pages else None
             prev = None
             next = None
-            if not no_pagination and url and page <= pages:
+            if url:
                 if page > 1:
                     prev = update_page_in_url(url, page - 1)
                 if page < pages:
