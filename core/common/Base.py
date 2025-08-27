@@ -5,7 +5,6 @@ from sqlalchemy import Column, Integer, DateTime, func, select, and_, String, de
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import declarative_base
-from core.schemas.base import MSPaginationBaseSchema
 from core.common.constants import StatusInvoiceEnum, SortType
 from math import ceil
 from app.common.list_schemas import ListBaseSchema
@@ -125,11 +124,23 @@ class BaseService:
             )
 
     @staticmethod
-    async def sort_pagination(stmt, sort_by: str, sort_type: SortType):
-        order_stmt = desc("id")
+    async def sort_pagination(
+        stmt, sort_by: str = None, sort_type: SortType = SortType.DESC
+    ):
+        table = stmt.froms[0]
+        pk_col = list(table.primary_key)[0]
+        order_stmt = desc(pk_col)
+
         if sort_by and sort_type != SortType.NONE:
-            if sort_type == SortType.DESC.value:
-                order_stmt = desc(sort_by)
-            else:
-                order_stmt = asc(sort_by)
+            col = table.c.get(sort_by)
+            if col is None:
+                raise ValueError(f"Column '{sort_by}' not found in table {table.name}")
+
+            col_expr = (
+                func.lower(col)
+                if hasattr(col.type, "python_type") and col.type.python_type == str
+                else col
+            )
+            order_stmt = desc(col_expr) if sort_type == SortType.DESC else asc(col_expr)
+
         return stmt.order_by(order_stmt)
