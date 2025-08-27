@@ -16,6 +16,7 @@ class AuthentionService(BaseService):
         try:
             access_token = TokenService.create_access_token(
                 data={
+                    "subID": query_user.id,
                     "subEmail": query_user.email,
                     "subName": query_user.name,
                     "role_id": query_user.role_id,

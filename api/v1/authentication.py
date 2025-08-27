@@ -1,4 +1,5 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter, status, HTTPException
+
 
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -7,6 +8,8 @@ from app.users.schemas.user import UserLoginSchema
 from core.common.database import get_async_db_session
 from core.services.authention import AuthentionService
 from core.utils.bearer import get_access_token
+from core.services.user import UserService
+from core.utils.authorize import authorize_user
 
 authentication = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -35,3 +38,16 @@ async def renew_token(
 ):
     auth_service = AuthentionService(db)
     return await auth_service.renew_token(refresh_access_token)
+
+
+
+@authentication.get("/me", status_code=status.HTTP_200_OK)
+async def get_me(
+    authorize=Depends(authorize_user("me:view")),
+    db_session: AsyncSession = Depends(get_async_db_session),
+):
+    user_service = UserService(db=db_session)
+    try:
+        return await user_service.get_user_detail(authorize.id)
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))

@@ -1,25 +1,17 @@
 from typing import Optional
 
-from core.schemas.base import MSBaseSchema, MSTimestamp
 from .user import UserCreateSchema, UserBaseSchema
+from datetime import datetime
 
 
-class PatientBaseSchema(MSBaseSchema):
+class PatientBaseSchema(UserBaseSchema):
     job: Optional[str]=None
     insurance_number: Optional[str]=None
 
+class PatientUpdateSchema:
+    job: Optional[str] = None
+    insurance_number: Optional[str] = None
 
-class PatientCreateSchema(UserCreateSchema, PatientBaseSchema):
-    pass
-
-
-class PatientUpdateSchema():
-    job: Optional[str]
-    insurance_number: Optional[str]
-
-
-class PatientReadSchema(UserBaseSchema,PatientBaseSchema):
-    created_at: MSTimestamp
-    updated_at: MSTimestamp
-
-
+class PatientReadSchema(PatientBaseSchema):
+    created_at: datetime
+    updated_at: Optional[datetime]=None

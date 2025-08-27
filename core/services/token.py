@@ -44,6 +44,7 @@ class TokenService(BaseService):
     async def verify_access_token(self, token: str):
         try:
             payload = jwt.decode(token, JWT_ACCESS_SECRET_KEY, algorithms=[ALGORITHM])
+            id: int = payload.get("subID")
             email: EmailStr = payload.get("subEmail")
             name: str = payload.get("subName")
             role_id: int = payload.get("role_id")
@@ -63,7 +64,7 @@ class TokenService(BaseService):
                     headers={"WWW-Authenticate": "Bearer"},
                 )
 
-            access_token_data = AccessTokenDataSchema(email=email, name=name, role_id=role_id)
+            access_token_data = AccessTokenDataSchema(id=id, email=email, name=name, role_id=role_id)
         except JWTError:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,

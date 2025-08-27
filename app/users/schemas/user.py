@@ -1,32 +1,41 @@
 from typing import Optional
+from datetime import datetime
 
-
-from pydantic import EmailStr
+from pydantic import EmailStr, field_serializer
 
 from core.common.constants import GenderEnum
-from core.schemas.base import MSBaseSchema, MSTimestamp
-
+from core.schemas.base import MSBaseSchema, MSPaginationBaseSchema
+from app.common.list_schemas import ListBaseSchema
 
 class UserBaseSchema(MSBaseSchema):
     name: str
     email: EmailStr
-    gender: GenderEnum
+    gender: int = GenderEnum.OTHER.gender_id
     role_id: int
-    password: str
     age: Optional[int] = None
+    @field_serializer("gender")
+    def gender_to_str(self, gender: int):
+        return GenderEnum(gender).gender_name
 
 
 class UserCreateSchema(UserBaseSchema):
+    password: str
     extra_fields: dict
+
+
+class UserBaseResponseSchema(UserBaseSchema):
+    id: int
 
 class UserResponseSchema(UserBaseSchema):
     id: int
     extra_fields: dict
 
-class UserReadSchema(UserBaseSchema):
-    created_at: MSTimestamp
-    updated_at: MSTimestamp
+class UserResponseSchema(UserBaseResponseSchema):
+    extra_fields: dict
 
+class UserReadSchema(UserBaseSchema):
+    created_at: datetime
+    updated_at: Optional[datetime]=None
 
 class UserUpdateSchema(MSBaseSchema):
     name: Optional[str] = None
@@ -39,3 +48,8 @@ class UserUpdateSchema(MSBaseSchema):
 class UserLoginSchema(MSBaseSchema):
     email: EmailStr
     password: str
+
+
+class UserListQuerySchema(MSPaginationBaseSchema):
+    role_id: Optional[int] = None
+    name: Optional[str] = None

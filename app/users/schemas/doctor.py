@@ -1,23 +1,18 @@
 from typing import Optional
+from datetime import datetime
 
-from core.schemas.base import MSBaseSchema, MSTimestamp
 from .user import UserCreateSchema, UserBaseSchema
 
 
-class DoctorBaseSchema(MSBaseSchema):
+class DoctorBaseSchema(UserBaseSchema):
     specialization: Optional[str]= None
     graduated_at: Optional[str]= None
 
 
-class DoctorCreateSchema(UserCreateSchema, DoctorBaseSchema):
-    pass
+class DoctorReadSchema(DoctorBaseSchema):
+    created_at: datetime
+    updated_at: Optional[datetime]=None
 
-
-class DoctorReadSchema(UserBaseSchema,DoctorBaseSchema):
-    created_at: MSTimestamp
-    updated_at: MSTimestamp
-
-
-class DoctorUpdateSchema():
+class DoctorUpdateSchema:
     specialization: Optional[str]
     graduated_at: Optional[str]
