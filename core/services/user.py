@@ -4,7 +4,8 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import select, and_, func
 from fastapi import HTTPException, status
 
-from core.common.Base import BaseService, MSPaginationBaseSchema
+from core.common.Base import BaseService
+from core.schemas.base import MSSortPaginationBaseSchema
 
 from core.common.mapping import ROLE_MAPPING_READ_SCHEMA
 from core.models.user import User
@@ -24,14 +25,16 @@ class UserService(BaseService):
             if conditions:
                 stmt = stmt.where(and_(*conditions))
             
-            pagination_data = MSPaginationBaseSchema(page=user_information.page,
+            sort_pagination_data = MSSortPaginationBaseSchema(page=user_information.page,
                                                      limit=user_information.limit,
-                                                     no_pagination=user_information.no_pagination)
+                                                     no_pagination=user_information.no_pagination,
+                                                     sort_by=user_information.sort_by,
+                                                     sort_type=user_information.sort_type)
             result = await self.fetch_pagination(
                 stmt,
                 request,
                 UserBaseResponseSchema,
-                pagination_data,
+                sort_pagination_data,
             )
             return result
 

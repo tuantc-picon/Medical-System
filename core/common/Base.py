@@ -1,12 +1,12 @@
 from typing import Optional
 
 from fastapi import HTTPException, status
-from sqlalchemy import Column, Integer, DateTime, func, select, and_, String
+from sqlalchemy import Column, Integer, DateTime, func, select, and_, String, desc, asc
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import declarative_base
 from core.schemas.base import MSPaginationBaseSchema
-from core.common.constants import StatusInvoiceEnum
+from core.common.constants import StatusInvoiceEnum, SortType
 from math import ceil
 from app.common.list_schemas import ListBaseSchema
 from core.utils.url import update_page_in_url
@@ -81,15 +81,18 @@ class BaseService:
         stmt,
         request,
         schema_response,
-        pagination_data,
+        sort_pagination_data,
     ):
         try:
-            limit = pagination_data.limit
-            page = pagination_data.page
-            no_pagination = pagination_data.no_pagination
+            limit = sort_pagination_data.limit
+            page = sort_pagination_data.page
+            no_pagination = sort_pagination_data.no_pagination
+            sort_by = sort_pagination_data.sort_by
+            sort_type = sort_pagination_data.sort_type
 
             if not no_pagination:
                 stmt = stmt.offset((page - 1) * limit).limit(limit)
+            stmt = await BaseService.sort_pagination(stmt, sort_by, sort_type)
 
             item = await self.db.execute(stmt)
             rows = item.fetchall()
@@ -120,3 +123,13 @@ class BaseService:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
             )
+
+    @staticmethod
+    async def sort_pagination(stmt, sort_by: str, sort_type: SortType):
+        order_stmt = desc("id")
+        if sort_by and sort_type != SortType.NONE:
+            if sort_type == SortType.DESC.value:
+                order_stmt = desc(sort_by)
+            else:
+                order_stmt = asc(sort_by)
+        return stmt.order_by(order_stmt)
