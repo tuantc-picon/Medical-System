@@ -26,6 +26,9 @@ class UserCreateSchema(UserBaseSchema):
 class UserBaseResponseSchema(UserBaseSchema):
     id: int
 
+class UserResponseSchema(UserBaseSchema):
+    id: int
+    extra_fields: dict
 
 class UserResponseSchema(UserBaseResponseSchema):
     extra_fields: dict

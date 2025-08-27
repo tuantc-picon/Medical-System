@@ -1,5 +1,6 @@
 from fastapi import APIRouter, status, HTTPException
 
+
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -37,6 +38,7 @@ async def renew_token(
 ):
     auth_service = AuthentionService(db)
     return await auth_service.renew_token(refresh_access_token)
+
 
 
 @authentication.get("/me", status_code=status.HTTP_200_OK)

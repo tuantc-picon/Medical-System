@@ -12,7 +12,6 @@ class PatientUpdateSchema:
     job: Optional[str] = None
     insurance_number: Optional[str] = None
 
-
 class PatientReadSchema(PatientBaseSchema):
     created_at: datetime
     updated_at: Optional[datetime]=None
