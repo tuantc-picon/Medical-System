@@ -142,7 +142,7 @@ class BaseService:
 
             col_expr = (
                 func.lower(col)
-                if hasattr(col.type, "python_type") and col.type.python_type == str
+                if (hasattr(col.type, "python_type") and col.type.python_type is str)
                 else col
             )
             order_stmt = desc(col_expr) if sort_type == SortType.DESC else asc(col_expr)
