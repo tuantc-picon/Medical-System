@@ -91,7 +91,7 @@ class BaseService:
 
             if not no_pagination:
                 stmt = stmt.offset((page - 1) * limit).limit(limit)
-            stmt = await BaseService._sort_pagination(stmt, sort_by, sort_type)
+            stmt = await self._sort_pagination(stmt, sort_by, sort_type)
 
             item = await self.db.execute(stmt)
             rows = item.fetchall()
@@ -123,23 +123,26 @@ class BaseService:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
             )
 
-    @staticmethod
     async def _sort_pagination(
-        stmt, sort_by: str = None, sort_type: SortType = SortType.DESC
+        self, stmt, sort_by: str = None, sort_type: SortType = SortType.DESC
     ):
         table = stmt.froms[0]
         pk_col = list(table.primary_key)[0]
         order_stmt = desc(pk_col)
 
         if sort_by and sort_type != SortType.NONE:
-            col = table.c.get(sort_by)
+            column_map = {c.name.split("_", 1)[-1]: c for c in stmt.selected_columns}
+
+            col = column_map.get(sort_by)
             if col is None:
-                raise ValueError(f"Column '{sort_by}' not found in table {table.name}")
+                raise ValueError(f"Column '{sort_by}' not found in statement.")
+
+            if col is None:
+                raise ValueError(f"Column '{sort_by}' not found in selected columns")
 
             col_expr = (
                 func.lower(col)
-                if hasattr(col.type, "python_type")
-                and isinstance(col.type.python_type, str)
+                if hasattr(col.type, "python_type") and col.type.python_type == str
                 else col
             )
             order_stmt = desc(col_expr) if sort_type == SortType.DESC else asc(col_expr)
