@@ -134,8 +134,6 @@ class BaseService:
             column_map = {c.name.split("_", 1)[-1]: c for c in stmt.selected_columns}
 
             col = column_map.get(sort_by)
-            if col is None:
-                raise ValueError(f"Column '{sort_by}' not found in statement.")
 
             if col is None:
                 raise ValueError(f"Column '{sort_by}' not found in selected columns")
