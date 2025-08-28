@@ -91,7 +91,7 @@ class BaseService:
 
             if not no_pagination:
                 stmt = stmt.offset((page - 1) * limit).limit(limit)
-            stmt = await BaseService.sort_pagination(stmt, sort_by, sort_type)
+            stmt = await BaseService._sort_pagination(stmt, sort_by, sort_type)
 
             item = await self.db.execute(stmt)
             rows = item.fetchall()
