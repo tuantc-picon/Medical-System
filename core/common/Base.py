@@ -1,12 +1,11 @@
 from typing import Optional
 
 from fastapi import HTTPException, status
-from sqlalchemy import Column, Integer, DateTime, func, select, and_, String
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy import Column, Integer, DateTime, func, select, and_, String, desc, asc
+from sqlalchemy.exc import IntegrityError, ArgumentError, CompileError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import declarative_base
-from core.schemas.base import MSPaginationBaseSchema
-from core.common.constants import StatusInvoiceEnum
+from core.common.constants import StatusInvoiceEnum, SortType
 from math import ceil
 from app.common.list_schemas import ListBaseSchema
 from core.utils.url import update_page_in_url
@@ -81,15 +80,18 @@ class BaseService:
         stmt,
         request,
         schema_response,
-        pagination_data,
+        sort_pagination_data,
     ):
         try:
-            limit = pagination_data.limit
-            page = pagination_data.page
-            no_pagination = pagination_data.no_pagination
+            limit = sort_pagination_data.limit
+            page = sort_pagination_data.page
+            no_pagination = sort_pagination_data.no_pagination
+            sort_by = sort_pagination_data.sort_by
+            sort_type = sort_pagination_data.sort_type
 
             if not no_pagination:
                 stmt = stmt.offset((page - 1) * limit).limit(limit)
+            stmt = await self._sort_pagination(stmt, sort_by, sort_type)
 
             item = await self.db.execute(stmt)
             rows = item.fetchall()
@@ -120,3 +122,42 @@ class BaseService:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
             )
+
+    async def _sort_pagination(
+        self, stmt, sort_by: str = None, sort_type: SortType = SortType.DESC
+    ):
+        try:
+            table = stmt.froms[0]
+            pk_col = list(table.primary_key)[0]
+            order_stmt = desc(pk_col)
+
+            if sort_by and sort_type != SortType.NONE:
+                column_map = {
+                    c.name.split("_", 1)[-1]: c for c in stmt.selected_columns
+                }
+
+                col = column_map.get(sort_by)
+
+                if col is None:
+                    raise ValueError(
+                        f"Column '{sort_by}' not found in selected columns"
+                    )
+
+                col_expr = (
+                    func.lower(col)
+                    if (
+                        hasattr(col.type, "python_type") and col.type.python_type is str
+                    )
+                    else col
+                )
+                order_stmt = (
+                    desc(col_expr) if sort_type == SortType.DESC else asc(col_expr)
+                )
+
+            return stmt.order_by(order_stmt)
+        except ValueError as ve:
+            raise HTTPException(status_code=400, detail=str(ve))
+        except (IndexError, AttributeError) as ae:
+            raise HTTPException(status_code=500, detail=f"Internal column error: {ae}")
+        except (ArgumentError, CompileError) as se:
+            raise HTTPException(status_code=500, detail=f"SQLAlchemy error: {se}")
